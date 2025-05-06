@@ -85,6 +85,19 @@
     ]
   },
   {
+    "element": "Fire",
+    "components": [
+      [
+          "Fire",
+          "Alcohol"
+      ],
+      [
+          "Fire",
+          "Coal"
+      ]
+    ]
+  },
+  {
     "element": "Water",
     "components": [
       [
