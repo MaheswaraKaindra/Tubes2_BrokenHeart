@@ -192,7 +192,7 @@ func main() {
 		log.Fatalf("Failed to fetch recipes: %v", err)
 	}
 
-	outputPath := filepath.Join("data", "recipes.json")
+	outputPath := filepath.Join("..", "data", "recipes.json")
 	file, err := os.Create(outputPath)
 	if err != nil {
 		log.Fatalf("Cannot create file: %v", err)
