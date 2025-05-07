@@ -1,4 +1,4 @@
-package main
+package scraping
 
 import (
 	"encoding/json"
