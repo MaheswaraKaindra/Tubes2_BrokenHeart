@@ -1,4 +1,4 @@
-module data-scraping
+module scraping
 
 go 1.24.2
 
