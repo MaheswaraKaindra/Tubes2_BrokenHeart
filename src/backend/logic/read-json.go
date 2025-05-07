@@ -1,12 +1,10 @@
-package read
+package main
 
 import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strings"
-	"container/list"
 )
 
 type Element struct {
@@ -36,18 +34,18 @@ func readJSON (filename string) ([]Element, error) {
     if err := json.Unmarshal(byteValue, &elements); err != nil {
         return nil, fmt.Errorf("Error converting to data struct from JSON: %w", err)
     }
-	
+
 	return elements, nil
 }
 
-func buildCacheMap (elements []Element) map[ComboKey]string {
-	cacheMap := make(map[ComboKey]string)
+func buildCacheMap (elements []Element) map[ComponentKey]string {
+	cacheMap := make(map[ComponentKey]string)
     for _, el := range elements {
         for _, pair := range el.Components {
             if len(pair) == 2 {
                 a, b := pair[0], pair[1]
-                comboMap[ComboKey{a, b}] = el.Result
-                comboMap[ComboKey{b, a}] = el.Result
+                cacheMap[ComponentKey{a, b}] = el.Name
+                cacheMap[ComponentKey{b, a}] = el.Name
             }
         }
     }
