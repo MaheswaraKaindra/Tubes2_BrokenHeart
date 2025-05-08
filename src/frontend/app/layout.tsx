@@ -1,15 +1,23 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Poppins } from "next/font/google"
+import { Racing_Sans_One, Montserrat_Alternates } from "next/font/google"
 
 import { ThemeProvider } from "@/components/theme-provider"
+import { Navbar } from "@/components/navbar"
 import "@/app/globals.css"
 
-const poppins = Poppins({
+const racingSans = Racing_Sans_One({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-racing-sans",
+})
+
+const montserrat = Montserrat_Alternates({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-poppins",
+  variable: "--font-sans",
 })
+
 
 export const metadata: Metadata = {
   title: "BrokenHeart - Recipe Finder",
@@ -24,8 +32,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
-      <body className={`${poppins.variable} font-sans`}>
+      <body className={`${racingSans.variable} ${montserrat.variable} font-sans`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          <Navbar />
           {children}
         </ThemeProvider>
       </body>

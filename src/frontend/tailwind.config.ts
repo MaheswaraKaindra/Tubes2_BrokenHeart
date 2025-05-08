@@ -1,15 +1,12 @@
 import type { Config } from "tailwindcss"
 
-const config = {
+const config: Config = {
   darkMode: ["class"],
   content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
-    "*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{ts,tsx}",
+    "./lib/**/*.{ts,tsx}",
   ],
-  prefix: "",
   theme: {
     container: {
       center: true,
@@ -53,6 +50,11 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // 💡 Tambahan warna sesuai Figma
+        "figma-yellow": "#FFDC73",
+        "figma-pink": "#FADADD",
+        "figma-purple": "#5C1A72",
+        "figma-brown": "#5F3B3B",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -60,8 +62,9 @@ const config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["var(--font-sans)"],
-        poppins: ["var(--font-poppins)"],
+        sans: ["var(--font-sans)", "sans-serif"],
+        poppins: ["var(--font-poppins)", "sans-serif"],
+        racing: ["var(--font-racing-sans)", "sans-serif"], // ✅ Racing Sans One
       },
       keyframes: {
         "accordion-down": {
@@ -80,6 +83,6 @@ const config = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config
+}
 
 export default config
