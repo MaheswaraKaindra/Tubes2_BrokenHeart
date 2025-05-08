@@ -1,4 +1,4 @@
-package logic
+package main
 
 import (
 	"encoding/json"
@@ -6,16 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 )
-
-type Element struct {
-	Name	string     `json:"element"`
-	Components	[][]string `json:"components"`
-}
-
-type ComponentKey struct {
-	Component1 string
-	Component2 string
-}
 
 func readJSON (filename string) ([]Element, error) {
 	file, err := os.Open(filename)
@@ -38,16 +28,25 @@ func readJSON (filename string) ([]Element, error) {
 	return elements, nil
 }
 
-func buildCacheMap (elements []Element) map[ComponentKey]string {
-	cacheMap := make(map[ComponentKey]string)
-    for _, el := range elements {
-        for _, pair := range el.Components {
-            if len(pair) == 2 {
-                a, b := pair[0], pair[1]
-                cacheMap[ComponentKey{a, b}] = el.Name
-                cacheMap[ComponentKey{b, a}] = el.Name
-            }
-        }
-    }
-    return cacheMap
+func BuildElementContainer(elements []Element) ElementContainer {
+	container := make(map[string][]ComponentKey)
+	isVisited := make(map[string]bool)
+
+	for _, el := range elements {
+		for _, pair := range el.Components {
+			if len(pair) == 2 {
+				key := ComponentKey{
+					Component1: pair[0],
+					Component2: pair[1],
+				}
+				container[el.Name] = append(container[el.Name], key)
+			}
+		}
+		isVisited[el.Name] = false
+	}
+
+	return ElementContainer{
+		Container: container,
+		IsVisited: isVisited,
+	}
 }
