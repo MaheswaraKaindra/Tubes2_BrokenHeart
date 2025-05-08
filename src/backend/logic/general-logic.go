@@ -1,4 +1,5 @@
-package main
+package logic
+
 import (
 	// Sementara kosong.
 	"fmt"
