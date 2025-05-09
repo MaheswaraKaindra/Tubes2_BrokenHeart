@@ -1,4 +1,4 @@
-package scraping
+package main
 
 import (
 	"encoding/json"
@@ -181,6 +181,7 @@ func GetAllRecipes(elements []Element) ([]Recipe, error) {
 
 func main() {
 	fmt.Println("Starting scraping...")
+	scrapeData()
 
 	elements, err := AllElements()
 	if err != nil {
