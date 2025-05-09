@@ -51,9 +51,8 @@ func main() {
 	elements, err := readJSON(filename, tiersFile)
 	if err != nil {
 		log.Fatalf("Failed to read: %v", err)
-	}	
+	}
 
-	printAllElements(elements)
 	container := buildElementContainer(elements)
 
 	var target string
@@ -64,15 +63,31 @@ func main() {
 		fmt.Scanln(&target)
 	}
 
-	fullTree := depthFirstSearch(target, &container)
+	recipes := container.Container[target]
+	numRecipes := len(recipes)
 
-
-	if fullTree == nil {
-		fmt.Println("There's no solution for the %s.", target)
+	if numRecipes == 0 {
+		fmt.Printf("There's no recipes for %s.\n", target)
 		return
 	}
 
-	fmt.Printf("Target %s has %d combinations.\n", fullTree.Name)
+	var selected int
+	for {
+		fmt.Printf("Choose combination (0 - %d): ", numRecipes-1)
+		_, err := fmt.Scanln(&selected)
+		if err == nil && selected >= 0 && selected < numRecipes {
+			break
+		}
+		fmt.Println("Invalid input.")
+	}
+
+	fullTree := firstDepthFirstSearch(target, &container, selected)
+
+	if fullTree == nil {
+		fmt.Printf("There's no way to make %s.\n", target)
+		return
+	}
 
 	printTree(fullTree, "", false)
 }
+
