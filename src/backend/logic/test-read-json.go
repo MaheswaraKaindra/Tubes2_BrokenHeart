@@ -7,7 +7,7 @@ import (
     "os"
 )
 
-func printTree(node *SingularTreeNode, indent string, isLeft bool) {
+func printTree(node *TreeNode, indent string, isLeft bool) {
 	if node == nil {
 		return
 	}
@@ -29,14 +29,31 @@ func printTree(node *SingularTreeNode, indent string, isLeft bool) {
 	printTree(node.Right, newIndent, false)
 }
 
+func printAllElements(elements []Element) {
+	fmt.Println("Element list:")
+	for _, el := range elements {
+		fmt.Printf("🔹 %s (Tier: %d)\n", el.Name, el.Tier)
+		if len(el.Components) == 0 {
+			fmt.Println("    -")
+		}
+		for i, pair := range el.Components {
+			if len(pair) == 2 {
+				fmt.Printf("    %d. %s + %s\n", i+1, pair[0], pair[1])
+			}
+		}
+	}
+}
+
 func main() {
 	filename := filepath.Join(".", "..", "data", "recipes.json")
+	tiersFile := filepath.Join(".", "..", "data", "tiers.json")
 
-	elements, err := readJSON(filename)
+	elements, err := readJSON(filename, tiersFile)
 	if err != nil {
 		log.Fatalf("Failed to read: %v", err)
-	}
+	}	
 
+	printAllElements(elements)
 	container := buildElementContainer(elements)
 
 	var target string
@@ -49,22 +66,13 @@ func main() {
 
 	fullTree := depthFirstSearch(target, &container)
 
+
 	if fullTree == nil {
 		fmt.Println("There's no solution for the %s.", target)
 		return
 	}
 
-	fmt.Printf("Target %s has %d combinations.\n", fullTree.Name, len(fullTree.Recipes))
+	fmt.Printf("Target %s has %d combinations.\n", fullTree.Name)
 
-	var rootIndex int
-	fmt.Printf("Choose recipes(0 - %d): ", len(fullTree.Recipes)-1)
-	fmt.Scanln(&rootIndex)
-
-	indexMap := map[string]int{
-		target: rootIndex,
-	}
-
-	selectedTree := getSingularTree(fullTree, indexMap)
-
-	printTree(selectedTree, "", false)
+	printTree(fullTree, "", false)
 }
