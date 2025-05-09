@@ -81,7 +81,20 @@ func main() {
 		fmt.Println("Invalid input.")
 	}
 
-	fullTree := firstDepthFirstSearch(target, &container, selected)
+	var method string
+	fmt.Print("Method (DFS/BFS): ")
+	fmt.Scanln(&method)
+	if method != "DFS" && method != "BFS" {
+		fmt.Println("Invalid method. Using DFS.")
+		method = "DFS"
+	}
+
+	var fullTree *TreeNode
+	if method == "BFS" {
+		fullTree = firstBreadthFirstSearch(target, &container, selected)
+	} else {
+		fullTree = firstDepthFirstSearch(target, &container, selected)
+	}
 
 	if fullTree == nil {
 		fmt.Printf("There's no way to make %s.\n", target)

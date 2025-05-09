@@ -28,6 +28,11 @@ type TreeNode struct {
 	Right    *TreeNode
 }
 
+type SearchState struct {
+	Node   *TreeNode
+	Target string
+}
+
 func isBaseElement(name string) bool {
 	switch name {
 	case "Air", "Water", "Fire", "Earth", "Time":
