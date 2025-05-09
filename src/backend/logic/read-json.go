@@ -1,4 +1,4 @@
-package logic
+package main
 
 import (
 	"encoding/json"
@@ -28,7 +28,7 @@ func readJSON (filename string) ([]Element, error) {
 	return elements, nil
 }
 
-func BuildElementContainer(elements []Element) ElementContainer {
+func buildElementContainer(elements []Element) ElementContainer {
 	container := make(map[string][]ComponentKey)
 	isVisited := make(map[string]bool)
 
