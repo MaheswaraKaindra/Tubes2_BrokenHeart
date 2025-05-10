@@ -4,6 +4,7 @@ import (
     "path/filepath"
     "fmt"
     "log"
+	"strings"
     "os"
 )
 
@@ -32,7 +33,7 @@ func printTree(node *TreeNode, indent string, isLeft bool) {
 func printAllElements(elements []Element) {
 	fmt.Println("Element list:")
 	for _, el := range elements {
-		fmt.Printf("🔹 %s (Tier: %d)\n", el.Name, el.Tier)
+		fmt.Printf("%s (Tier: %d)\n", el.Name, el.Tier)
 		if len(el.Components) == 0 {
 			fmt.Println("    -")
 		}
@@ -53,6 +54,8 @@ func main() {
 		log.Fatalf("Failed to read: %v", err)
 	}
 
+	printAllElements(elements)
+
 	container := buildElementContainer(elements)
 
 	var target string
@@ -61,6 +64,7 @@ func main() {
 	} else {
 		fmt.Print("Target: ")
 		fmt.Scanln(&target)
+		target = strings.ToLower(target)
 	}
 
 	recipes := container.Container[target]
@@ -71,16 +75,6 @@ func main() {
 		return
 	}
 
-	var selected int
-	for {
-		fmt.Printf("Choose combination (0 - %d): ", numRecipes-1)
-		_, err := fmt.Scanln(&selected)
-		if err == nil && selected >= 0 && selected < numRecipes {
-			break
-		}
-		fmt.Println("Invalid input.")
-	}
-
 	var method string
 	fmt.Print("Method (DFS/BFS): ")
 	fmt.Scanln(&method)
@@ -89,11 +83,43 @@ func main() {
 		method = "DFS"
 	}
 
+	var shortest string
+	fmt.Print("Shortest (Y/N): ")
+	fmt.Scanln(&shortest)
+	if shortest != "Y" && shortest != "N" {
+		fmt.Println("Invalid input. Using N.")
+		shortest = "N"
+	}
+
 	var fullTree *TreeNode
-	if method == "BFS" {
-		fullTree = firstBreadthFirstSearch(target, &container, selected)
+	if shortest == "N" {
+		var selected int
+		for {
+			fmt.Printf("Choose combination (0 - %d): ", numRecipes-1)
+			_, err := fmt.Scanln(&selected)
+			if err == nil && selected >= 0 && selected < numRecipes {
+				break
+			}
+			fmt.Println("Invalid input.")
+		}
+
+		if method == "BFS" {
+			fullTree = breadthFirstSearch(target, &container, selected)
+		} else if method == "DFS" {
+			fullTree = firstDepthFirstSearch(target, &container, selected)
+		} else {
+			fmt.Println("Invalid method. Using DFS.")
+			fullTree = firstDepthFirstSearch(target, &container, selected)
+		}
 	} else {
-		fullTree = firstDepthFirstSearch(target, &container, selected)
+		if method == "BFS" {
+			fullTree = shortestBreadthFirstSearch(target, &container)
+		} else if method == "DFS" {
+			fullTree = shortestDepthFirstSearch(target, &container)
+		} else {
+			fmt.Println("Invalid method. Using DFS.")
+			fullTree = shortestDepthFirstSearch(target, &container)
+		}
 	}
 
 	if fullTree == nil {

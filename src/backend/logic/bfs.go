@@ -2,107 +2,157 @@ package main
 
 import (
 	"container/list"
+	"strings"
+	// "fmt"
 )
 
-func firstBreadthFirstSearch(target string, container *ElementContainer, index int) *TreeNode {
-	if isBaseElement(target) {
-		return &TreeNode{Name: target}
-	}
-	if _, exists := container.Container[target]; !exists {
-		return nil
-	}
+// Untuk enqueue : queue.PushBack(node)
+// Untuk dequeue : queue.Remove(queue.Front()), bisa simpan ke value jika butuh.
 
-	visited := make(map[string]bool)
+func breadthFirstSearch(target string, container *ElementContainer, index int) *TreeNode {
+	target = strings.ToLower(target)
 	queue := list.New()
 
-	i := 0
-	for _, pair := range container.Container[target] {
-		
-		if i < index {
-			i++
+	root := &TreeNode{Name: target}
+	queue.PushBack(root)
+
+	first := true
+
+	for queue.Len() > 0 {
+		element := queue.Front()
+		queue.Remove(element)
+
+		parentNode := element.Value.(*TreeNode)
+
+		pairs := container.Container[parentNode.Name]
+		if len(pairs) == 0 {
 			continue
 		}
 
-		i++
+		i := index
 
-		queue.PushBack(SearchState {
-			Node: &TreeNode{
-				Name:  target,
-				Left:  &TreeNode{Name: pair.Component1},
-				Right: &TreeNode{Name: pair.Component2},
-			},
-			Target: target,
-		})
+		if !first {
+			shortestMap := make(map[int]int)
+			i = 0
+			for _, pair := range container.Container[parentNode.Name] {
+				// fmt.Printf("[EXPAND] %s → %s + %s\n", parentNode.Name, pair.Component1, pair.Component2)
+				t1, ok1 := container.ElementTier[pair.Component1]
+				t2, ok2 := container.ElementTier[pair.Component2]
+				tTarget, okT := container.ElementTier[parentNode.Name]
+		
+				if !ok1 || !ok2 || !okT {
+					i++
+					continue
+				}
+				if t1 >= tTarget || t2 >= tTarget {
+					i++
+					continue
+				}
+
+				shortestMap[i] = container.ElementTier[pair.Component1] + container.ElementTier[pair.Component2]
+				i++
+			}
+			i = minKey(shortestMap)
+		}
+
+		pair := pairs[i]
+		leftName := pair.Component1
+		rightName := pair.Component2
+		
+		if (leftName == parentNode.Name || rightName == parentNode.Name) {
+			continue
+		}
+		
+		leftNode := &TreeNode{Name: leftName}
+		rightNode := &TreeNode{Name: rightName}
+
+		if !isBaseElement(leftName) {
+			parentNode.Left = leftNode
+			queue.PushBack(leftNode)
+		} else {
+			parentNode.Left = &TreeNode{Name: leftName}
+		}
+		
+		if !isBaseElement(rightName) {
+			parentNode.Right = rightNode
+			queue.PushBack(rightNode)
+		} else {
+			parentNode.Right = &TreeNode{Name: rightName}
+		}
+
+		first = false
 	}
 
-	for queue.Len() > 0 {
-		elem := queue.Remove(queue.Front()).(SearchState)
-		node := elem.Node
-
-		if !isBaseElement(node.Left.Name) && !visited[node.Left.Name] {
-			visited[node.Left.Name] = true
-			node.Left = depthFirstSearch(node.Left.Name, container)
-		}
-		if !isBaseElement(node.Right.Name) && !visited[node.Right.Name] {
-			visited[node.Right.Name] = true
-			node.Right = depthFirstSearch(node.Right.Name, container)
-		}
-
-		if node.Left != nil && node.Right != nil {
-			return node
-		}
-	}
-
-	return nil
+	return root
 }
 
-func breadthFirstSearch(target string, container *ElementContainer) *TreeNode {
-	if isBaseElement(target) {
-		return &TreeNode{Name: target}
-	}
-	if _, exists := container.Container[target]; !exists {
-		return nil
-	}
-
-	visited := make(map[string]bool)
+func shortestBreadthFirstSearch(target string, container *ElementContainer) *TreeNode {
+	target = strings.ToLower(target)
 	queue := list.New()
 
-	for _, pair := range container.Container[target] {
-		t1, ok1 := container.ElementTier[pair.Component1]
-		t2, ok2 := container.ElementTier[pair.Component2]
-		tTarget := container.ElementTier[target]
+	root := &TreeNode{Name: target}
+	queue.PushBack(root)
 
-		if !ok1 || !ok2 || t1 > tTarget || t2 > tTarget {
+	for queue.Len() > 0 {
+		element := queue.Front()
+		queue.Remove(element)
+
+		parentNode := element.Value.(*TreeNode)
+
+		pairs := container.Container[parentNode.Name]
+		if len(pairs) == 0 {
 			continue
 		}
 
-		queue.PushBack(SearchState{
-			Node: &TreeNode{
-				Name:  target,
-				Left:  &TreeNode{Name: pair.Component1},
-				Right: &TreeNode{Name: pair.Component2},
-			},
-			Target: target,
-		})
+		shortestMap := make(map[int]int)
+
+		i := 0
+		for _, pair := range container.Container[parentNode.Name] {
+			// fmt.Printf("[EXPAND] %s → %s + %s\n", parentNode.Name, pair.Component1, pair.Component2)
+			t1, ok1 := container.ElementTier[pair.Component1]
+			t2, ok2 := container.ElementTier[pair.Component2]
+			tTarget, okT := container.ElementTier[parentNode.Name]
+	
+			if !ok1 || !ok2 || !okT {
+				i++
+				continue
+			}
+			if t1 >= tTarget || t2 >= tTarget {
+				i++
+				continue
+			}
+
+			shortestMap[i] = container.ElementTier[pair.Component1] + container.ElementTier[pair.Component2]
+			i++
+		}
+
+		index := minKey(shortestMap)
+
+		pair := pairs[index]
+		leftName := pair.Component1
+		rightName := pair.Component2
+		
+		if (leftName == parentNode.Name || rightName == parentNode.Name) {
+			continue
+		}
+		
+		leftNode := &TreeNode{Name: leftName}
+		rightNode := &TreeNode{Name: rightName}
+
+		if !isBaseElement(leftName) {
+			parentNode.Left = leftNode
+			queue.PushBack(leftNode)
+		} else {
+			parentNode.Left = &TreeNode{Name: leftName}
+		}
+		
+		if !isBaseElement(rightName) {
+			parentNode.Right = rightNode
+			queue.PushBack(rightNode)
+		} else {
+			parentNode.Right = &TreeNode{Name: rightName}
+		}
 	}
 
-	for queue.Len() > 0 {
-		elem := queue.Remove(queue.Front()).(SearchState)
-		node := elem.Node
-
-		if !isBaseElement(node.Left.Name) && !visited[node.Left.Name] {
-			visited[node.Left.Name] = true
-			node.Left = depthFirstSearch(node.Left.Name, container)
-		}
-		if !isBaseElement(node.Right.Name) && !visited[node.Right.Name] {
-			visited[node.Right.Name] = true
-			node.Right = depthFirstSearch(node.Right.Name, container)
-		}
-
-		if node.Left != nil && node.Right != nil {
-			return node
-		}
-	}
-
-	return nil
+	return root
 }

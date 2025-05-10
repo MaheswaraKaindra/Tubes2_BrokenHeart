@@ -32,19 +32,3 @@ type SearchState struct {
 	Node   *TreeNode
 	Target string
 }
-
-func isBaseElement(name string) bool {
-	switch name {
-	case "Air", "Water", "Fire", "Earth", "Time":
-		return true
-	default:
-		return false
-	}
-}
-
-func normalizeKey(a, b string) ComponentKey {
-    if a < b {
-        return ComponentKey{a, b}
-    }
-    return ComponentKey{b, a}
-}
