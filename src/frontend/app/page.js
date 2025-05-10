@@ -6,8 +6,8 @@ export default function Home() {
     <div className="w-full h-full flex flex-col items-center ">
       <main className="flex flex-col">
         <div className="flex flex-col items-center justify-center w-full h-[350px] gap-10">
-          <tittle className='text-8xl text-purple-dark font-racing'>Find Your Recipe!</tittle>
-          <h1 className="bg-orange-bright rounded-full px-8 py-2 shadow-orange font-monts font-bold text-purple-dark " >Choose a Search Algorithm!</h1>
+          <h1 className='text-7xl text-purple-dark font-racing'>Find Your Recipe!</h1>
+          <h2 className="bg-orange-bright rounded-full px-8 py-2 shadow-orange font-monts font-bold text-purple-dark " >Choose a Search Algorithm!</h2>
         </div>
         <div className="flex flex-row items-center justify-center gap-8">
           <Link href="/bfs">
