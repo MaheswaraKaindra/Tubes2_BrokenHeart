@@ -18,6 +18,42 @@ type Element struct {
 	ImageURL string `json:"imageUrl"`
 }
 
+// fetchRealImageURL tries to find a real image URL for an element by visiting its wiki page
+func fetchRealImageURL(elementURL string) string {
+	// Make HTTP request to the element's wiki page
+	response, err := http.Get(elementURL)
+	if err != nil {
+		log.Printf("Warning: Failed to fetch image for %s: %v", elementURL, err)
+		return ""
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != 200 {
+		log.Printf("Warning: Failed to fetch image, status code: %d", response.StatusCode)
+		return ""
+	}
+
+	// Parse the HTML
+	doc, err := goquery.NewDocumentFromReader(response.Body)
+	if err != nil {
+		log.Printf("Warning: Failed to parse HTML: %v", err)
+		return ""
+	}
+
+	// Try to find the element image in the infobox or main content
+	// First look for the infobox image
+	imgURL, exists := doc.Find(".pi-image img").First().Attr("src")
+	if !exists || strings.Contains(imgURL, "data:image/gif;base64") {
+		// Try to find an image in the main content
+		imgURL, exists = doc.Find(".mw-parser-output img").First().Attr("src")
+		if !exists || strings.Contains(imgURL, "data:image/gif;base64") {
+			return ""
+		}
+	}
+
+	return imgURL
+}
+
 func main() {
 	// URL of the wiki page
 	url := "https://little-alchemy.fandom.com/wiki/Elements_(Little_Alchemy_2)"
@@ -75,15 +111,27 @@ func main() {
 			link := nameCell.Find("a").First()
 			name := strings.TrimSpace(link.Text())
 			
-			// Get image URL from the image tag
-			imgSrc, exists := nameCell.Find("img").Attr("src")
-			if !exists {
-				imgSrc = "" // No image found
-			}
-			
 			// Skip empty names
 			if name == "" {
 				return
+			}
+			
+			// Get the URL for the wiki page of this element
+			href, exists := link.Attr("href")
+			if !exists {
+				href = ""
+			}
+			
+			// Construct image URL based on the element name
+			// Get image URL from the image tag, but filter out placeholder GIFs
+			imgSrc, exists := nameCell.Find("img").Attr("src")
+			if !exists || strings.Contains(imgSrc, "data:image/gif;base64") {
+				// If no image or it's a placeholder, create a URL for the element's wiki page to get it later
+				if href != "" {
+					imgSrc = "https://little-alchemy.fandom.com" + href
+				} else {
+					imgSrc = ""
+				}
 			}
 			
 			// Add the element to our list
@@ -118,16 +166,13 @@ func main() {
 					return
 				}
 				
-				// Get image if available
-				imgSrc, _ := s.Find("img").Attr("src")
-				if imgSrc == "" {
-					imgSrc, _ = s.Parent().Find("img").Attr("src")
-				}
+				// Construct a URL for the element's wiki page to get the image later
+				elementURL := "https://little-alchemy.fandom.com" + href
 				
 				// Add the element
 				elements = append(elements, Element{
 					Name:     name,
-					ImageURL: imgSrc,
+					ImageURL: elementURL, // Store the wiki page URL to get a real image
 				})
 			}
 		})
@@ -154,6 +199,35 @@ func main() {
 	}
 
 	fmt.Printf("Found %d unique elements\n", len(finalElements))
+	
+	// Try to fetch real image URLs for elements (with a limit to avoid too many requests)
+	maxImagesToFetch := 10
+	fetchCount := 0
+	
+	for i := range finalElements {
+		// Skip elements that already have valid image URLs
+		if finalElements[i].ImageURL != "" && !strings.HasPrefix(finalElements[i].ImageURL, "https://little-alchemy.fandom.com/wiki/") {
+			continue
+		}
+		
+		// Limit the number of requests to avoid overloading the server
+		if fetchCount >= maxImagesToFetch {
+			break
+		}
+		
+		// Try to get a real image URL
+		if strings.HasPrefix(finalElements[i].ImageURL, "https://little-alchemy.fandom.com/wiki/") {
+			realImageURL := fetchRealImageURL(finalElements[i].ImageURL)
+			if realImageURL != "" {
+				finalElements[i].ImageURL = realImageURL
+				fmt.Printf("Found image for %s: %s\n", finalElements[i].Name, realImageURL)
+			} else {
+				// If we can't get a real image, use a generic one or clear it
+				finalElements[i].ImageURL = ""
+			}
+			fetchCount++
+		}
+	}
 
 	// Create JSON file
 	file, err := os.Create("little_alchemy_elements.json")
