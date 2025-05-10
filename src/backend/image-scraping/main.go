@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"regexp"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -34,7 +33,7 @@ func main() {
 		log.Fatalf("Failed to fetch the page, status code: %d", response.StatusCode)
 	}
 
-	// Save the HTML for debugging
+	// Read the HTML
 	htmlBytes, err := io.ReadAll(response.Body)
 	if err != nil {
 		log.Fatalf("Failed to read response body: %v", err)
@@ -53,145 +52,79 @@ func main() {
 
 	elements := make([]Element, 0)
 
-	// Try various approaches to find elements
-
-	// First approach: Look for the list elements directly
-	fmt.Println("Attempting to scrape elements from lists...")
-	doc.Find("#mw-content-text .mw-parser-output ul li").Each(func(i int, s *goquery.Selection) {
-		linkText := strings.TrimSpace(s.Find("a").First().Text())
-		if linkText != "" {
-			imgSrc, _ := s.Find("img").Attr("src")
-			elements = append(elements, Element{Name: linkText, ImageURL: imgSrc})
+	// Find all tier sections that contain element tables
+	doc.Find(`[id^="Tier_"], #Starting_elements, #Special_element`).Each(func(i int, section *goquery.Selection) {
+		// Move to the element table that follows each tier heading
+		sectionID := section.AttrOr("id", "")
+		if sectionID == "" {
+			return
 		}
-	})
 
-	// Second approach: Try to find tables with element data
-	if len(elements) == 0 {
-		fmt.Println("Attempting to scrape from tables...")
-		doc.Find("table").Each(func(i int, s *goquery.Selection) {
-			s.Find("tr").Each(func(j int, row *goquery.Selection) {
-				// Skip header rows
-				if j > 0 {
-					cells := row.Find("td")
-					if cells.Length() >= 2 {
-						nameCell := cells.Eq(1)
-						name := strings.TrimSpace(nameCell.Text())
-
-						// If cell text is empty, try finding link text
-						if name == "" {
-							name = strings.TrimSpace(nameCell.Find("a").Text())
-						}
-
-						// Find image in first cell
-						imgSrc, _ := cells.Eq(0).Find("img").Attr("src")
-
-						if name != "" {
-							elements = append(elements, Element{
-								Name:     name,
-								ImageURL: imgSrc,
-							})
-						}
-					}
-				}
+		// Find the table that follows this section
+		elementTable := section.Parent().NextUntil("h2, h3").Find("table").First()
+		
+		// Process each row in the table
+		elementTable.Find("tr").Each(func(j int, row *goquery.Selection) {
+			// Skip header rows (usually the first row)
+			if j == 0 {
+				return
+			}
+			
+			// Get the element name from the link in the first cell
+			nameCell := row.Find("td").First()
+			link := nameCell.Find("a").First()
+			name := strings.TrimSpace(link.Text())
+			
+			// Get image URL from the image tag
+			imgSrc, exists := nameCell.Find("img").Attr("src")
+			if !exists {
+				imgSrc = "" // No image found
+			}
+			
+			// Skip empty names
+			if name == "" {
+				return
+			}
+			
+			// Add the element to our list
+			elements = append(elements, Element{
+				Name:     name,
+				ImageURL: imgSrc,
 			})
 		})
-	}
+	})
 
-	// Third approach: Try to find by HTML patterns in the text
+	// If the above approach fails, try a more direct approach to find all element links
 	if len(elements) == 0 {
-		fmt.Println("Attempting to parse HTML content directly...")
-
-		// Look for patterns in the HTML that might indicate elements
-		htmlContent := string(htmlBytes)
-
-		// Define a regular expression to find element entries
-		// This is a simplified pattern and might need adjustment
-		elementPattern := regexp.MustCompile(`<a[^>]*?href="[^"]*?/wiki/([^"]+)"[^>]*?>([^<]+)</a>`)
-
-		matches := elementPattern.FindAllStringSubmatch(htmlContent, -1)
-		for _, match := range matches {
-			if len(match) >= 3 {
-				slug := match[1]
-				name := strings.TrimSpace(match[2])
-
-				// Skip navigation links and other non-element links
-				if strings.Contains(slug, "Category:") ||
-					strings.Contains(slug, "Help:") ||
-					strings.Contains(slug, "Special:") {
-					continue
-				}
-
-				// Only add if it looks like an element name
-				if name != "" && len(name) < 50 {
-					elements = append(elements, Element{
-						Name:     name,
-						ImageURL: "", // We don't have images with this fallback method
-					})
-				}
-			}
-		}
-	}
-
-	// Fourth approach: Look for the specific section that contains the list of elements
-	if len(elements) == 0 {
-		fmt.Println("Looking for sections with element lists...")
-
-		// Find headings that might contain element lists
-		doc.Find("h2, h3").Each(func(i int, s *goquery.Selection) {
-			heading := strings.TrimSpace(s.Text())
-			if strings.Contains(strings.ToLower(heading), "list of element") ||
-				strings.Contains(strings.ToLower(heading), "elements") {
-
-				// Find lists after this heading
-				elementsList := s.NextUntil("h2, h3").Find("li")
-
-				elementsList.Each(func(j int, li *goquery.Selection) {
-					link := li.Find("a").First()
-					name := strings.TrimSpace(link.Text())
-					imgSrc, _ := li.Find("img").Attr("src")
-
-					if name != "" {
-						elements = append(elements, Element{
-							Name:     name,
-							ImageURL: imgSrc,
-						})
-					}
-				})
-			}
-		})
-	}
-
-	// Last approach: Try to find any links that look like elements
-	if len(elements) == 0 {
-		fmt.Println("Scanning all links on the page...")
-
-		visited := make(map[string]bool)
-
+		fmt.Println("Using alternative approach to find elements...")
+		
 		doc.Find("a").Each(func(i int, s *goquery.Selection) {
-			name := strings.TrimSpace(s.Text())
-			href, _ := s.Attr("href")
-
-			// Only consider links that look like wiki pages for elements
-			if href != "" &&
-				strings.Contains(href, "/wiki/") &&
-				!strings.Contains(href, "Category:") &&
-				!strings.Contains(href, "Special:") &&
-				!strings.Contains(href, "Help:") &&
-				name != "" &&
-				len(name) < 50 {
-
-				// Skip if we've already seen this name
-				if visited[name] {
+			href, exists := s.Attr("href")
+			if !exists {
+				return
+			}
+			
+			// Check if the link points to an element page
+			if strings.HasPrefix(href, "/wiki/") && 
+			   !strings.Contains(href, "Category:") &&
+			   !strings.Contains(href, "Elements_") {
+				
+				name := strings.TrimSpace(s.Text())
+				
+				// Ignore links with no text or very long text (likely not elements)
+				if name == "" || len(name) > 50 || 
+				   strings.Contains(name, "Tier") || 
+				   strings.Contains(name, "element") {
 					return
 				}
-				visited[name] = true
-
-				// Try to find an image near this link
+				
+				// Get image if available
 				imgSrc, _ := s.Find("img").Attr("src")
 				if imgSrc == "" {
 					imgSrc, _ = s.Parent().Find("img").Attr("src")
 				}
-
+				
+				// Add the element
 				elements = append(elements, Element{
 					Name:     name,
 					ImageURL: imgSrc,
@@ -200,26 +133,16 @@ func main() {
 		})
 	}
 
-	// Print the number of elements found
-	fmt.Printf("Found %d elements\n", len(elements))
-
-	// Process results - remove duplicates and filter out non-elements
+	// Process results - remove duplicates
 	uniqueElements := make(map[string]Element)
 	for _, element := range elements {
-		// Skip very short or very long names (likely not elements)
-		if len(element.Name) < 2 || len(element.Name) > 50 {
+		// Skip non-element entries
+		if strings.Contains(strings.ToLower(element.Name), "tier") ||
+		   strings.Contains(strings.ToLower(element.Name), "category:") ||
+		   strings.Contains(strings.ToLower(element.Name), "elements") {
 			continue
 		}
-
-		// Skip navigation and UI elements
-		if strings.Contains(strings.ToLower(element.Name), "category:") ||
-			strings.Contains(strings.ToLower(element.Name), "help:") ||
-			strings.Contains(strings.ToLower(element.Name), "special:") ||
-			strings.Contains(strings.ToLower(element.Name), "edit") ||
-			strings.Contains(strings.ToLower(element.Name), "jump to") {
-			continue
-		}
-
+		
 		// Store only unique elements by name
 		uniqueElements[element.Name] = element
 	}
@@ -230,7 +153,7 @@ func main() {
 		finalElements = append(finalElements, element)
 	}
 
-	fmt.Printf("After filtering, found %d unique elements\n", len(finalElements))
+	fmt.Printf("Found %d unique elements\n", len(finalElements))
 
 	// Create JSON file
 	file, err := os.Create("little_alchemy_elements.json")
