@@ -29,7 +29,7 @@ const Navbar = () => {
         {/* buttons */}
         <div className='flex items-center justify-between gap-5 text-lg'>
           <Link href="/">
-            <button className={`hover:scale-105 transition-transform duration-300 ease-in-out flex items-center justify-center px-5 rounded-full hover:bg-purple-light hover:text-purple-dark  ${pathname ==='/' ? 'bg-purple-dark text-white' : 'bg-cream-light text-purple-dark'}`}>
+            <button className={`hover:scale-105 transition-transform duration-300 ease-in-out flex items-center justify-center px-5 rounded-full hover:bg-purple-light hover:text-purple-dark  ${pathname ==='/' ? 'bg-purple-dark-light text-white' : 'bg-cream-light text-purple-dark'}`}>
               <Image
                 src={ pathname === '/' ? Home2 : Home1}
                 alt="Home"
@@ -40,7 +40,7 @@ const Navbar = () => {
             </button>
           </Link>
           <Link href="/bfs">
-             <button className={`hover:scale-105 transition-transform duration-300 ease-in-out flex items-center justify-center px-5 rounded-full hover:bg-purple-light hover:text-purple-dark  ${pathname ==='/bfs' ? 'bg-purple-dark text-white' : 'bg-cream-light text-purple-dark'}`}>
+             <button className={`hover:scale-105 transition-transform duration-300 ease-in-out flex items-center justify-center px-5 rounded-full hover:bg-purple-light hover:text-purple-dark  ${pathname ==='/bfs' ? 'bg-purple-dark-light text-white' : 'bg-cream-light text-purple-dark'}`}>
               <Image
                 src={ pathname === '/bfs' ? Search2 : Search1}
                 alt="Search"
@@ -51,7 +51,7 @@ const Navbar = () => {
             </button>  
           </Link>  
             <Link href="/dfs">
-            <button className={`hover:scale-105 transition-transform duration-300 ease-in-out flex items-center justify-center px-5 rounded-full hover:bg-purple-light hover:text-purple-dark  ${pathname ==='/dfs' ? 'bg-purple-dark text-white' : 'bg-cream-light text-purple-dark'}`}>
+            <button className={`hover:scale-105 transition-transform duration-300 ease-in-out flex items-center justify-center px-5 rounded-full hover:bg-purple-light hover:text-purple-dark  ${pathname ==='/dfs' ? 'bg-purple-dark-light text-white' : 'bg-cream-light text-purple-dark'}`}>
               <Image
                 src={ pathname === '/dfs' ? Search2 : Search1}
                 alt="Search"

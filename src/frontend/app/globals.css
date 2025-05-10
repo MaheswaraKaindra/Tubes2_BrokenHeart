@@ -5,10 +5,11 @@
   --foreground: #171717;
   --cream-light: #F1ECE3;
   --orange-bright: #FFA424;
-  --orang-dark: #BC7C21;
+  --orange-dark: #BC7C21;
   --purple-bright: #C824A4;
   --purple-dark: #801669;
   --purple-light: #CFACBE;
+  --purple-dark-light: #B981A6;
   --dark: #380028;
   --dark-light:#62475B;
   --custom-grey: #B8B8B8;
@@ -44,8 +45,8 @@ body {
   background-color: var(--orange-bright);
 }
 
-.bg-orang-dark {
-  background-color: var(--orang-dark);
+.bg-orange-dark {
+  background-color: var(--orange-dark);
 }
 
 .bg-purple-bright {
@@ -58,6 +59,10 @@ body {
 
 .bg-purple-light {
   background-color: var(--purple-light);
+}
+
+.bg-purple-dark-light {
+  background-color: var(--purple-dark-light);
 }
 
 .bg-dark {
@@ -80,8 +85,8 @@ body {
   color: var(--orange-bright);
 }
 
-.text-orang-dark {
-  color: var(--orang-dark);
+.text-orange-dark {
+  color: var(--orange-dark);
 }
 
 .text-purple-bright {
@@ -94,6 +99,10 @@ body {
 
 .text-purple-light {
   color: var(--purple-light);
+}
+
+.text-purple-dark-light {
+  color: var(--purple-dark-light);
 }
 
 .text-dark {
@@ -121,5 +130,13 @@ body {
 
 .font-racing {
   font-family: var(--font-racing-sans);
+}
+
+.shadow-orange {
+  box-shadow: 0 4px 6px var(--orange-dark);
+}
+
+.shadow-dark-light {
+  box-shadow: 0 4px 6px var(--dark-light);
 }
 
