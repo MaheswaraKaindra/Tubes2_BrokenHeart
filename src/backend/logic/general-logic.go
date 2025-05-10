@@ -32,32 +32,3 @@ type SearchState struct {
 	Node   *TreeNode
 	Target string
 }
-
-func isBaseElement(name string) bool {
-	switch name {
-	case "air", "water", "fire", "earth", "time":
-		return true
-	default:
-		return false
-	}
-}
-
-func normalizeKey(a, b string) ComponentKey {
-    if a < b {
-        return ComponentKey{a, b}
-    }
-    return ComponentKey{b, a}
-}
-
-func minKey(m map[int]int) int {
-	minKey := -1
-	minVal := int(^uint(0) >> 1) // nilai maksimum int
-
-	for k, v := range m {
-		if v < minVal {
-			minVal = v
-			minKey = k
-		}
-	}
-	return minKey
-}

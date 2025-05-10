@@ -3,6 +3,7 @@ package main
 import (
 	// Sementara kosong.
 	// "fmt"
+	"strings"
 )
 
 func firstDepthFirstSearch(target string, container *ElementContainer, index int) *TreeNode {
@@ -91,7 +92,6 @@ func shortestDepthFirstSearch(target string, container *ElementContainer) *TreeN
 	shortestMap := make(map[int]int)
 	i := 0
 	for _, pair := range container.Container[target] {
-		// fmt.Printf("[EXPAND] %s → %s + %s\n", parentNode.Name, pair.Component1, pair.Component2)
 		t1, ok1 := container.ElementTier[pair.Component1]
 		t2, ok2 := container.ElementTier[pair.Component2]
 		tTarget, okT := container.ElementTier[target]
