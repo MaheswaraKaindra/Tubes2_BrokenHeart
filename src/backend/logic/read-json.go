@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 func readJSON(recipes string, tiersFile string) ([]Element, error) {
@@ -24,7 +25,15 @@ func readJSON(recipes string, tiersFile string) ([]Element, error) {
 		return nil, fmt.Errorf("Error parsing recipes JSON: %w", err)
 	}
 
-	// Baca tiers
+	for i := range elements {
+		elements[i].Name = strings.ToLower(elements[i].Name)
+		for j := range elements[i].Components {
+			for k := range elements[i].Components[j] {
+				elements[i].Components[j][k] = strings.ToLower(elements[i].Components[j][k])
+			}
+		}
+	}
+
 	file2, err := os.Open(tiersFile)
 	if err != nil {
 		return nil, fmt.Errorf("Error opening tiers file: %w", err)
@@ -41,22 +50,24 @@ func readJSON(recipes string, tiersFile string) ([]Element, error) {
 		return nil, fmt.Errorf("Error parsing tiers JSON: %w", err)
 	}
 
-	// Assign tier ke masing-masing elemen
-	for i, el := range elements {
-		if tier, ok := tiers[el.Name]; ok {
+	normalizedTiers := make(map[string]int)
+	for k, v := range tiers {
+		normalizedTiers[strings.ToLower(k)] = v
+	}
+
+	for i := range elements {
+		if tier, ok := normalizedTiers[elements[i].Name]; ok {
 			elements[i].Tier = tier
 		} else {
-			elements[i].Tier = 0 // atau -1 sebagai tanda tidak diketahui
+			elements[i].Tier = 0
 		}
 	}
 
-	required := []string{"Fire", "Time"}
+	required := []string{"fire", "time"}
 	existing := make(map[string]bool)
-
 	for _, el := range elements {
 		existing[el.Name] = true
 	}
-
 	for _, name := range required {
 		if !existing[name] {
 			elements = append(elements, Element{
@@ -82,6 +93,7 @@ func buildElementContainer(elements []Element) ElementContainer {
 					Component1: pair[0],
 					Component2: pair[1],
 				}
+
 				container[el.Name] = append(container[el.Name], key)
 			}
 		}
