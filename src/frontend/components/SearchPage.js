@@ -6,6 +6,30 @@ import { MultipleResultCard } from './MultipleResultCard'
 import { CombinationCard } from '@/components/CombinationCard'
 import Image from 'next/image'
 import Dummy from '../public/water.png'
+import TreeVisualizer from "@/components/TreeVisualizer";
+
+
+const dummyTree = {
+  name: 'Root',
+  left: {
+    name: 'Left Child',
+    left: {
+      name: 'Left-Left Child',
+    },
+    right: {
+      name: 'Left-Right Child',
+    },
+  },
+  right: {
+    name: 'Right Child',
+    left: {
+      name: 'Right-Left Child',
+    },
+    right: {
+      name: 'Right-Right Child',
+    },
+  },
+};
 
 export const SearchPage = () => {
   const [isToggled, setIsToggled] = useState(false);
@@ -94,9 +118,12 @@ export const SearchPage = () => {
             />            
           </div>
 
+          {/* TAMBAHIN ANOTHER RULE, KLO ADA RESULT BARU MUNCULIN */}
           {/* kalau shortest, lgsg tampilin result treenya */}
           {!isToggled && (
-            <div></div>
+            <div className='w-[600px] h-full flex flex-col items-center justify-center gap-10'>
+              <TreeVisualizer tree={dummyTree} />
+            </div>
           )}
 
           {/* kalau multiple, lgsg tampilin result treenya */}
