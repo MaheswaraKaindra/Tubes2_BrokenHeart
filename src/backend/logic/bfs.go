@@ -86,7 +86,7 @@ func BreadthFirstSearch(target string, container *ElementContainer, index int) *
 	return root
 }
 
-func shortestBreadthFirstSearch(target string, container *ElementContainer) *TreeNode {
+func ShortestBreadthFirstSearch(target string, container *ElementContainer) *TreeNode {
 	target = strings.ToLower(target)
 	queue := list.New()
 

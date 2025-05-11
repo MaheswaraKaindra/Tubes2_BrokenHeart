@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func readJSON(recipes string, tiersFile string) ([]Element, error) {
+func ReadJSON(recipes string, tiersFile string) ([]Element, error) {
 	file, err := os.Open(recipes)
 	if err != nil {
 		return nil, fmt.Errorf("Error opening recipes file: %w", err)
@@ -81,7 +81,7 @@ func readJSON(recipes string, tiersFile string) ([]Element, error) {
 	return elements, nil
 }
 
-func buildElementContainer(elements []Element) ElementContainer {
+func BuildElementContainer(elements []Element) ElementContainer {
 	container := make(map[string][]ComponentKey)
 	isVisited := make(map[string]bool)
 	elementTier := make(map[string]int)

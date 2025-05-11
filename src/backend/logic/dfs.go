@@ -59,7 +59,7 @@ func FirstDepthFirstSearch(target string, container *ElementContainer, index int
 	return nil
 }
 
-func shortestDepthFirstSearch(target string, container *ElementContainer) *TreeNode {
+func ShortestDepthFirstSearch(target string, container *ElementContainer) *TreeNode {
 	target = strings.ToLower(target)
 	if _, exists := container.Container[target]; !exists {
 		if !isBaseElement(target) {
