@@ -8,7 +8,6 @@ import (
 )
 
 import "github.com/MaheswaraKaindra/Tubes2_BrokenHeart/src/backend/logic"
-import "github.com/MaheswaraKaindra/Tubes2_BrokenHeart/src/backend/scraping"
 
 type SearchRequest struct {
 	Target string `json:"target"`
@@ -51,12 +50,6 @@ func bfsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid JSON: "+err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	recipesPath := filepath.Join(".", "data", "recipes.json")
-	tiersPath := filepath.Join(".", "data", "tiers.json")
-
-	scraping.dataScraping(recipesPath)
-	scraping.tierScraping(tiersPath)
 
 	container, err := loadElementContainerFromFiles()
 	if err != nil {
