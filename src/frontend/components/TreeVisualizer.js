@@ -24,7 +24,7 @@ const TreeVisualizer = ({ tree }) => {
       const id = `${nodes.length}`;
       nodes.push({
         id,
-        data: { label: node.name },
+        data: { label: node.Name },
         position: { x: 0, y: 0 }, 
       });
 
@@ -40,8 +40,8 @@ const TreeVisualizer = ({ tree }) => {
         dagreGraph.setEdge(parentId, id);
       }
 
-      if (node.left) traverse(node.left, id);
-      if (node.right) traverse(node.right, id);
+      if (node.Left) traverse(node.Left, id);
+      if (node.Right) traverse(node.Right, id);
     };
 
     traverse(tree);

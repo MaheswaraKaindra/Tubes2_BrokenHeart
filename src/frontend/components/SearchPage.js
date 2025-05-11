@@ -31,14 +31,19 @@ const dummyTree = {
   },
 };
 
-export const SearchPage = () => {
+export const SearchPage = (algorithm) => {
   const [isToggled, setIsToggled] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [input, setInput] = useState("");
 const [result, setResult] = useState(null);
 
 const handleSubmit = async () => {
-  const endpoint = isToggled ? "dfs" : "bfs";
+  // const endpoint = algoritm
+  let endpoint = algorithm.algorithm === "bfs" ? "bfs" : "dfs";
+  if (isToggled) {
+    endpoint += "multiple";
+  }
+  // const endpoint = isToggled ? "bfs" : "dfs";
   try {
     const res = await fetch(`http://localhost:8080/api/${endpoint}`, {
       method: "POST",
@@ -79,44 +84,45 @@ const handleSubmit = async () => {
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit(); 
-          }}>
-          <input
+            }}>
+            <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Enter your element"
             className="rounded-full w-full p-2 text-center bg-orange-bright shadow-orange focus:outline-none focus:ring-0"
-          />
+            />
 
-          <button
+            <button
             type="submit"
+            onClick={() => setInput(input.toLowerCase())}
             className="bg-purple-dark text-white font-monts font-bold px-4 py-2 rounded-full shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out focus:outline-none focus:border-2 focus:border-[#380028]"
-          >
+            >
             Go!
-          </button>
-        </form>
+            </button>
+            </form>
 
-        {/* toggle */}
-      <div className='flex justify-center items-center gap-5 w-full font-monts text-purple-dark'>
-        <div className='flex items-center justify-center gap-2'>
-          <div className='text-center '>Shortest Route</div>
-          <button
+          {/* toggle */}
+          <div className='flex justify-center items-center gap-5 w-full font-monts text-purple-dark'>
+          <div className='flex items-center justify-center gap-2'>
+            <div className='text-center '>Shortest Route</div>
+            <button
             onClick={handleToggle}
             className={`w-14 h-8 flex items-center rounded-full p-1 transition-colors duration-300 ${
               isToggled ? "bg-purple-dark" : "bg-purple-light"
             } focus:outline-none`}
-          >
+            >
             <div
               className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ${
-                isToggled ? "translate-x-6" : "translate-x-0"
+              isToggled ? "translate-x-6" : "translate-x-0"
               }`}
             />
-          </button>
-          <div className='text-center text-sm'>Multiple Recipes</div>            
-        </div>
-        {isToggled &&
-        <div>
-          <form
+            </button>
+            <div className='text-center text-sm'>Multiple Recipes</div>            
+          </div>
+          {isToggled &&
+          <div>
+            <form
             className="flex items-center justify-center gap-5 w-full font-monts"
             onSubmit={(e) => {
               e.preventDefault();
@@ -143,26 +149,35 @@ const handleSubmit = async () => {
           <div className=' px-10 py-5 text-center flex flex-col gap-5 items-center justify-center w-full h-full rounded-2xl bg-purple-light shadow-dark-light text-2xl'>   
             Here are the recipes to find: 
           </div>
-          {result && (
+          {result && !isToggled && (
             <div className='mb-10'>
               <ElementCard 
-                picture={result.Image}
+                // picture={result.Image}
                 name={result.Name}
+              />
+            </div>
+          )}
+
+          {result && isToggled && (
+            <div className='mb-10'>
+              <ElementCard 
+                // picture={result.Image}
+                name={result.trees[0].Name}
               />
             </div>
           )}
 
           {/* TAMBAHIN ANOTHER RULE, KLO ADA RESULT BARU MUNCULIN */}
           {/* kalau shortest, lgsg tampilin result treenya */}
-          {!isToggled && (
-            <div className='w-[600px] h-full flex flex-col items-center justify-center gap-10'>
-              <TreeVisualizer tree={dummyTree} />
+          {result && !isToggled && (
+            <div className='w-[1000px] h-full flex flex-col items-center justify-center gap-10'>
+              <TreeVisualizer tree={result} />
             </div>
           )}
 
           {/* kalau multiple, lgsg tampilin result treenya */}
           {isToggled &&(
-          <MultipleResultCard/>)
+          <MultipleResultCard result = {result}/>)
           }
 
       </div>

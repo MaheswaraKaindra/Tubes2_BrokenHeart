@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { CombinationCard } from './CombinationCard'
 import Dummy from '../public/water.png'
+import TreeVisualizer from './TreeVisualizer'
 
 const DummyData = [
   {
@@ -23,29 +24,44 @@ const DummyData = [
   },
 ]
 
-export const MultipleResultCard = () => {
+export const MultipleResultCard = ({result}) => {
   const [selectedIndex, setSelectedIndex] = useState(null)
-
-  // if (!WholeResult) return null // hanya muncul jika parameter terpenuhi
+      console.log(result?.recipes);
 
   return (
     <div className='w-[800px] bg-purple-light rounded-2xl shadow-dark-light p-10 h-full flex flex-col items-center justify-center gap-10'>
-      <div className='font-monts text-2xl font-bold text-purple-dark shadow-2xl'>Click one of the following to see the Tree of the recipe!</div>
-      {selectedIndex === null ? (
-        DummyData.map((item, index) => (
+      <div className='text-center font-monts text-2xl font-bold text-purple-dark'>Click one of the following to see the Tree of the selected recipe!</div>
+      {selectedIndex === null && Array.isArray(result?.recipes) ? (
+        result.recipes.map((item, index) => (
           <CombinationCard
-            key={item.id}
-            picture1={item.picture}
-            name1={item.name}
+            key={item.id || index}
+            name1={item[0]}
+            name2={item[1]}
             onClick={() => setSelectedIndex(index)}
           />
         ))
       ) : (
-        <div 
-        onClick={() => setSelectedIndex(null)}
-        className='w-[500px] h-[500px] bg-purple-dark text-white rounded-2xl'>
-          {/* nanti kasi button back woi onclicknya di button aja*/}
-          {DummyData[selectedIndex].result}
+        <div className='w-full bg-purple-dark text-white rounded-2xl p-4 flex flex-col items-center justify-center gap-4'>
+          {selectedIndex !== null && (
+            <>
+              <div className='w-full h-full flex items-center justify-center'>
+                {result?.trees && result.trees[selectedIndex] ? (
+                  <TreeVisualizer
+                    data={result.trees[selectedIndex]}
+                  />
+                ) : (
+                  <div className='text-center text-white'>Tree data not available</div>
+                )}
+              </div>
+
+              <button 
+                onClick={() => setSelectedIndex(null)} 
+                className='bg-white text-purple-dark px-4 py-2 rounded-lg font-semibold'
+              >
+                Back
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>

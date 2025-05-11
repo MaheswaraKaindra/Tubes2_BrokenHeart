@@ -4,7 +4,7 @@ import { SearchPage } from '@/components/SearchPage'
 const page = () => {
   return (
     <div>
-      <SearchPage />
+      <SearchPage algoritm = {"bfs"} />
     </div>
   )
 }
