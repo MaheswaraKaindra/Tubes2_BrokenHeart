@@ -181,7 +181,7 @@ func GetAllRecipes(elements []Element) ([]Recipe, error) {
 	return allRecipes, nil
 }
 
-func dataScraping(outputPath string) {
+func DataScraping(outputPath string) {
 	fmt.Println("Starting scraping...")
 	scrapeData()
 

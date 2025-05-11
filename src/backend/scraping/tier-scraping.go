@@ -112,7 +112,7 @@ func scrapeTier() ([]ElementTier, error) {
 	return items, nil
 }
 
-func scrapeData(outputPath string) {
+func ScrapeData(outputPath string) {
 	items, err := scrapeTier()
 	if err != nil {
 		log.Fatalf("Failed to scrape: %v", err)
