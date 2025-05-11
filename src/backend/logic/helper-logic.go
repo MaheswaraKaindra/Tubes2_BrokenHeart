@@ -31,11 +31,11 @@ func minKey(m map[int]int) int {
 
 // FUNGSI HELPER BOSS SENGGOL DONG...
 
-func getLength(container *ElementContainer, element string) int {
+func GetLength(container *ElementContainer, element string) int {
 	return len(container.Container[element])
 }
 
-func getRecipe(container *ElementContainer, element string, many int) []ComponentKey {
+func GetRecipe(container *ElementContainer, element string, many int) []ComponentKey {
 	returnValue := make([]ComponentKey, 0)
 	for i := 0; i < many; i++ {
 		returnValue = append(returnValue, container.Container[element][i])
