@@ -2,98 +2,115 @@ package main
 
 import (
 	"encoding/json"
-	"net/http"
-	"strings"
 	"fmt"
+	"net/http"
+	"os"
 
-	"backend/logic" // import the logic package
+	"backend/logic"
 )
 
-// Your existing struct types
-// type ElementPair struct {
-// 	Component1 string `json:"component1"`
-// 	Component2 string `json:"component2"`
-// }
+type SearchRequest struct {
+	Target string `json:"target"`
+	Index  int    `json:"index"`  // Optional for now
+}
 
-// type ElementContainer struct {
-// 	Container     map[string][]ElementPair `json:"container"`
-// 	ElementTier   map[string]int           `json:"element_tier"`
-// }
+// CORS Middleware
+func enableCors(w http.ResponseWriter) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+}
 
-// type TreeNode struct {
-// 	Name  string    `json:"name"`
-// 	Left  *TreeNode `json:"left,omitempty"`
-// 	Right *TreeNode `json:"right,omitempty"`
-// }
-
-// Helper: minimal mockup
-func isBaseElement(name string) bool {
-	// Adjust to your logic
-	base := []string{"fire", "water", "earth", "air"}
-	name = strings.ToLower(name)
-	for _, b := range base {
-		if b == name {
-			return true
-		}
+// Utility: Load container from JSON files
+func loadElementContainer() (*logic.ElementContainer, error) {
+	// Read recipes.json
+	recipesData, err := os.ReadFile("../data/recipes.json")
+	if err != nil {
+		return nil, err
 	}
-	return false
-}
-
-// Helper: find the index of minimum value in map
-func minKey(m map[int]int) int {
-	min := int(^uint(0) >> 1) // Max int
-	minKey := -1
-	for k, v := range m {
-		if v < min {
-			min = v
-			minKey = k
-		}
+		// Read tiers.json
+	tiersData, err := os.ReadFile("../data/tiers.json")
+	if err != nil {
+		return nil, err
 	}
-	return minKey
+
+	// Unmarshal into container structure
+	var container logic.ElementContainer
+	if err := json.Unmarshal(recipesData, &container.Container); err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(tiersData, &container.ElementTier); err != nil {
+		return nil, err
+	}
+
+	container.IsVisited = make(map[string]bool)
+
+	return &container, nil
 }
 
-// Import your BFS algorithm (already defined)
+func bfsHandler(w http.ResponseWriter, r *http.Request) {
+	enableCors(w)
+	if r.Method == http.MethodOptions {
+		return
+	}
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
+		return
+	}
 
-// Request struct
-type BFSRequest struct {
-	Target    string           `json:"target"`
-	Container logic.ElementContainer `json:"container"`
-	Index     int              `json:"index"`
+	var req SearchRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid JSON: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	container, err := loadElementContainer()
+	if err != nil {
+		http.Error(w, "Error loading data: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	root := logic.BreadthFirstSearch(req.Target, container, req.Index)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(root)
 }
 
-// Handler function
-func BFSHandler(w http.ResponseWriter, r *http.Request) {
-    // CORS headers
-    w.Header().Set("Access-Control-Allow-Origin", "*")
-    w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-    w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+func dfsHandler(w http.ResponseWriter, r *http.Request) {
+	enableCors(w)
+	if r.Method == http.MethodOptions {
+		return
+	}
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
+		return
+	}
 
-    // Handle preflight request
-    if r.Method == http.MethodOptions {
-        return
-    }
+	var req SearchRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid JSON: "+err.Error(), http.StatusBadRequest)
+		return
+	}
 
-    if r.Method != http.MethodPost {
-        http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
-        return
-    }
+	container, err := loadElementContainer()
+	if err != nil {
+		http.Error(w, "Error loading data: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-    var req BFSRequest
-    err := json.NewDecoder(r.Body).Decode(&req)
-    if err != nil {
-        http.Error(w, "Invalid JSON: "+err.Error(), http.StatusBadRequest)
-        return
-    }
+	root := logic.FirstDepthFirstSearch(req.Target, container, req.Index)
 
-    root := logic.BreadthFirstSearch(req.Target, &req.Container, req.Index)
-
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(root)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(root)
 }
 
-// Server entry point
 func main() {
-	http.HandleFunc("/bfs", BFSHandler)
+	http.HandleFunc("/api/bfs", bfsHandler)
+	http.HandleFunc("/api/dfs", dfsHandler)
+
 	fmt.Println("Server running on :8080")
-	http.ListenAndServe(":8080", nil)
+	logErr := http.ListenAndServe(":8080", nil)
+	if logErr != nil {
+		fmt.Println("Server error:", logErr)
+	}
 }
