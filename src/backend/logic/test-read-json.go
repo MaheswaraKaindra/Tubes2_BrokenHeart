@@ -1,10 +1,10 @@
-package main
+package logic
 
 import (
     "path/filepath"
     "fmt"
     "log"
-	"strings"
+	  "strings"
     "os"
 )
 
@@ -104,12 +104,12 @@ func main() {
 		}
 
 		if method == "BFS" {
-			fullTree = breadthFirstSearch(target, &container, selected)
+			fullTree = BreadthFirstSearch(target, &container, selected)
 		} else if method == "DFS" {
-			fullTree = firstDepthFirstSearch(target, &container, selected)
+			fullTree = FirstDepthFirstSearch(target, &container, selected)
 		} else {
 			fmt.Println("Invalid method. Using DFS.")
-			fullTree = firstDepthFirstSearch(target, &container, selected)
+			fullTree = FirstDepthFirstSearch(target, &container, selected)
 		}
 	} else {
 		if method == "BFS" {

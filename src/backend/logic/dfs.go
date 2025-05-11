@@ -1,4 +1,4 @@
-package main
+package logic
 
 import (
 	// Sementara kosong.
@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func firstDepthFirstSearch(target string, container *ElementContainer, index int) *TreeNode {
+func FirstDepthFirstSearch(target string, container *ElementContainer, index int) *TreeNode {
 	target = strings.ToLower(target)
 	if _, exists := container.Container[target]; !exists {
 		if !isBaseElement(target) {

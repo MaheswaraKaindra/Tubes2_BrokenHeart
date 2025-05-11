@@ -1,4 +1,4 @@
-package main
+package logic
 
 import (
 	"container/list"
@@ -9,7 +9,7 @@ import (
 // Untuk enqueue : queue.PushBack(node)
 // Untuk dequeue : queue.Remove(queue.Front()), bisa simpan ke value jika butuh.
 
-func breadthFirstSearch(target string, container *ElementContainer, index int) *TreeNode {
+func BreadthFirstSearch(target string, container *ElementContainer, index int) *TreeNode {
 	target = strings.ToLower(target)
 	queue := list.New()
 
