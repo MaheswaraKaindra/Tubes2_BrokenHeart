@@ -1,6 +1,8 @@
 import { Racing_Sans_One, Montserrat_Alternates } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import Image from "next/image";
+import Logo from "../public/brokenheart.png";
 
 const racingSans = Racing_Sans_One({
   variable: "--font-racing-sans",
@@ -25,6 +27,22 @@ export default function RootLayout({ children }) {
       <body
         className={`${montserrat.variable} ${racingSans.variable} antialiased`}
       >
+        <Image
+          src={Logo}
+          alt="Logo"
+          width={100}
+          height={100}
+          className="absolute top-120 -left-15 opacity-30 -z-20 rotate-30 w-[350px]"
+        />
+
+        <Image
+          src={Logo}
+          alt="Logo"
+          width={100}
+          height={100}
+          className="absolute top-30 -right-15 opacity-30 -z-20 -rotate-30 w-[200px]"
+        />
+
         <Navbar />
           <div>
             {children}          
