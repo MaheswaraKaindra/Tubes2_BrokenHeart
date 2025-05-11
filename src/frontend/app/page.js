@@ -1,5 +1,30 @@
 import Image from "next/image";
 import Link from "next/link";
+import TreeVisualizer from "@/components/TreeVisualizer";
+
+
+const dummyTree = {
+  name: 'Root',
+  left: {
+    name: 'Left Child',
+    left: {
+      name: 'Left-Left Child',
+    },
+    right: {
+      name: 'Left-Right Child',
+    },
+  },
+  right: {
+    name: 'Right Child',
+    left: {
+      name: 'Right-Left Child',
+    },
+    right: {
+      name: 'Right-Right Child',
+    },
+  },
+};
+
 
 export default function Home() {
   return (
@@ -23,6 +48,10 @@ export default function Home() {
             </button>
           </Link>
         </div>
+
+      <TreeVisualizer tree={dummyTree} />
+
+
       </main>
     </div>
   );
