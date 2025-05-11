@@ -11,7 +11,7 @@ import "github.com/MaheswaraKaindra/Tubes2_BrokenHeart/src/backend/logic"
 
 type SearchRequest struct {
 	Target string `json:"target"`
-	Index  int    `json:"index"`  // Optional for now
+	Index  int    `json:"index"`
 }
 
 // CORS Middleware
@@ -169,12 +169,12 @@ func multiplebfsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	loopCount := logic.GetLength(container, req.Target) // Get the number of loops
+	loopCount := logic.GetLength(container, req.Target)
 	recipes := logic.GetRecipe(container, req.Target, loopCount)
 	var trees []interface{}
 
 	for i := 0; i < loopCount; i++ {
-		tree := logic.BreadthFirstSearch(req.Target, container, req.Index)
+		tree := logic.BreadthFirstSearch(req.Target, container, i)
 		trees = append(trees, tree)
 	}
 
@@ -208,12 +208,12 @@ func multipledfsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	loopCount := logic.GetLength(container, req.Target) // Get the number of loops
+	loopCount := logic.GetLength(container, req.Target)
 	recipes := logic.GetRecipe(container, req.Target, loopCount)
 	var trees []interface{}
 
 	for i := 0; i < loopCount; i++ {
-		tree := logic.FirstDepthFirstSearch(req.Target, container, req.Index)
+		tree := logic.FirstDepthFirstSearch(req.Target, container, i)
 		trees = append(trees, tree)
 	}
 
