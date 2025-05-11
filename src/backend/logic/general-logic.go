@@ -9,6 +9,7 @@ type Element struct {
 	Name		string     `json:"element"`
 	Components	[][]string `json:"components"`
 	Tier		int
+	Image 		string
 }
 
 type ComponentKey struct {
@@ -20,6 +21,7 @@ type ElementContainer struct {
 	Container map[string][]ComponentKey
 	ElementTier map[string]int
 	IsVisited map[string]bool
+	ElementImage map[string]string
 }
 
 type TreeNode struct {

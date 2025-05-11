@@ -25,8 +25,9 @@ func enableCors(w http.ResponseWriter) {
 func loadElementContainerFromFiles() (*logic.ElementContainer, error) {
 	recipesPath := filepath.Join(".", "data", "recipes.json")
 	tiersPath := filepath.Join(".", "data", "tiers.json")
+	imagesPath := filepath.Join(".", "data", "images.json")
 	
-	elements, err := logic.ReadJSON(recipesPath, tiersPath)
+	elements, err := logic.ReadJSON(recipesPath, tiersPath, imagesPath)
 	if err != nil {
 		return nil, err
 	}

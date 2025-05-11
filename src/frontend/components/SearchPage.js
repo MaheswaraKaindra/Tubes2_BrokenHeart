@@ -122,7 +122,7 @@ const handleSubmit = async () => {
           {result && (
             <div className='mb-10'>
               <ElementCard 
-                picture={Dummy}
+                picture={result.Image}
                 name={result.Name}
               />
             </div>

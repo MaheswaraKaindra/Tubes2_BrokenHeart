@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func ReadJSON(recipes string, tiersFile string) ([]Element, error) {
+func ReadJSON(recipes string, tiersFile string, imagesFile string) ([]Element, error) {
 	file, err := os.Open(recipes)
 	if err != nil {
 		return nil, fmt.Errorf("Error opening recipes file: %w", err)
@@ -63,7 +63,39 @@ func ReadJSON(recipes string, tiersFile string) ([]Element, error) {
 		}
 	}
 
-	required := []string{"fire", "time"}
+	type imageEntry struct {
+		Name string `json:"name"`
+		Img  string `json:"img"`
+	}
+
+	file3, err := os.Open(imagesFile)
+	if err != nil {
+		return nil, fmt.Errorf("Error opening images file: %w", err)
+	}
+	defer file3.Close()
+
+	byteImage, err := ioutil.ReadAll(file3)
+	if err != nil {
+		return nil, fmt.Errorf("Error reading images file: %w", err)
+	}
+
+	var images []imageEntry
+	if err := json.Unmarshal(byteImage, &images); err != nil {
+		return nil, fmt.Errorf("Error parsing images JSON: %w", err)
+	}
+
+	normalizedImages := make(map[string]string)
+	for _, img := range images {
+		normalizedImages[strings.ToLower(img.Name)] = img.Img
+	}
+
+	for i := range elements {
+		if img, ok := normalizedImages[elements[i].Name]; ok {
+			elements[i].Image = img
+		}
+	}
+
+	required := []string{"fire", "time"} // HARDCODED BOZO HAHAHAHA
 	existing := make(map[string]bool)
 	for _, el := range elements {
 		existing[el.Name] = true
@@ -85,6 +117,7 @@ func BuildElementContainer(elements []Element) ElementContainer {
 	container := make(map[string][]ComponentKey)
 	isVisited := make(map[string]bool)
 	elementTier := make(map[string]int)
+	elementImage := make(map[string]string)
 
 	for _, el := range elements {
 		for _, pair := range el.Components {
@@ -100,11 +133,13 @@ func BuildElementContainer(elements []Element) ElementContainer {
 
 		isVisited[el.Name] = false
 		elementTier[el.Name] = el.Tier
+		elementImage[el.Name] = el.Image
 	}
 
 	return ElementContainer{
 		Container:    container,
 		IsVisited:    isVisited,
 		ElementTier:  elementTier,
+		ElementImage: elementImage,
 	}
 }
