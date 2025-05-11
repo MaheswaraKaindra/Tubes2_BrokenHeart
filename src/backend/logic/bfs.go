@@ -13,7 +13,7 @@ func BreadthFirstSearch(target string, container *ElementContainer, index int) *
 	target = strings.ToLower(target)
 	queue := list.New()
 
-	root := &TreeNode{Name: target}
+	root := &TreeNode{Name: target, Image: container.ElementImage[target]}
 	queue.PushBack(root)
 
 	first := true
@@ -63,21 +63,21 @@ func BreadthFirstSearch(target string, container *ElementContainer, index int) *
 			continue
 		}
 		
-		leftNode := &TreeNode{Name: leftName}
-		rightNode := &TreeNode{Name: rightName}
+		leftNode := &TreeNode{ Name: leftName, Image: container.ElementImage[leftName] }
+		rightNode := &TreeNode{ Name: rightName, Image: container.ElementImage[rightName] }
 
 		if !isBaseElement(leftName) {
 			parentNode.Left = leftNode
 			queue.PushBack(leftNode)
 		} else {
-			parentNode.Left = &TreeNode{Name: leftName}
+			parentNode.Left = &TreeNode{Name: leftName, Image: container.ElementImage[leftName]}
 		}
 		
 		if !isBaseElement(rightName) {
 			parentNode.Right = rightNode
 			queue.PushBack(rightNode)
 		} else {
-			parentNode.Right = &TreeNode{Name: rightName}
+			parentNode.Right = &TreeNode{Name: rightName, Image: container.ElementImage[rightName]}
 		}
 
 		first = false
@@ -90,7 +90,7 @@ func ShortestBreadthFirstSearch(target string, container *ElementContainer) *Tre
 	target = strings.ToLower(target)
 	queue := list.New()
 
-	root := &TreeNode{Name: target}
+	root := &TreeNode{Name: target, Image: container.ElementImage[target]}
 	queue.PushBack(root)
 
 	for queue.Len() > 0 {
@@ -136,21 +136,21 @@ func ShortestBreadthFirstSearch(target string, container *ElementContainer) *Tre
 			continue
 		}
 		
-		leftNode := &TreeNode{Name: leftName}
-		rightNode := &TreeNode{Name: rightName}
+		leftNode := &TreeNode{Name: leftName, Image: container.ElementImage[leftName]}
+		rightNode := &TreeNode{Name: rightName, Image: container.ElementImage[rightName]}
 
 		if !isBaseElement(leftName) {
 			parentNode.Left = leftNode
 			queue.PushBack(leftNode)
 		} else {
-			parentNode.Left = &TreeNode{Name: leftName}
+			parentNode.Left = &TreeNode{Name: leftName, Image: container.ElementImage[leftName]}
 		}
 		
 		if !isBaseElement(rightName) {
 			parentNode.Right = rightNode
 			queue.PushBack(rightNode)
 		} else {
-			parentNode.Right = &TreeNode{Name: rightName}
+			parentNode.Right = &TreeNode{Name: rightName, Image: container.ElementImage[rightName]}
 		}
 	}
 

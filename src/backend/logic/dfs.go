@@ -14,6 +14,7 @@ func FirstDepthFirstSearch(target string, container *ElementContainer, index int
 		}
 		return &TreeNode{
 			Name:  target,
+			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
 		}
@@ -22,6 +23,7 @@ func FirstDepthFirstSearch(target string, container *ElementContainer, index int
 	if isBaseElement(target) {
 		return &TreeNode {
 			Name:  target,
+			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
 		}
@@ -30,6 +32,7 @@ func FirstDepthFirstSearch(target string, container *ElementContainer, index int
 	if container.IsVisited[target] {
 		return &TreeNode{
 			Name:  target,
+			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
 		}
@@ -50,6 +53,7 @@ func FirstDepthFirstSearch(target string, container *ElementContainer, index int
 		if left != nil && right != nil {
 			return &TreeNode{
 				Name:  target,
+				Image: container.ElementImage[target],
 				Left:  left,
 				Right: right,
 			}
@@ -67,6 +71,7 @@ func ShortestDepthFirstSearch(target string, container *ElementContainer) *TreeN
 		}
 		return &TreeNode{
 			Name:  target,
+			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
 		}
@@ -75,6 +80,7 @@ func ShortestDepthFirstSearch(target string, container *ElementContainer) *TreeN
 	if isBaseElement(target) {
 		return &TreeNode {
 			Name:  target,
+			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
 		}
@@ -83,6 +89,7 @@ func ShortestDepthFirstSearch(target string, container *ElementContainer) *TreeN
 	if container.IsVisited[target] {
 		return &TreeNode{
 			Name:  target,
+			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
 		}
@@ -118,6 +125,7 @@ func ShortestDepthFirstSearch(target string, container *ElementContainer) *TreeN
 	if left != nil && right != nil {
 		return &TreeNode{
 			Name:  target,
+			Image: container.ElementImage[target],
 			Left:  left,
 			Right: right,
 		}
@@ -134,6 +142,7 @@ func depthFirstSearch(target string, container *ElementContainer) *TreeNode {
 		}
 		return &TreeNode{
 			Name:  target,
+			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
 		}
@@ -142,6 +151,7 @@ func depthFirstSearch(target string, container *ElementContainer) *TreeNode {
 	if isBaseElement(target) {
 		return &TreeNode {
 			Name:  target,
+			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
 		}
@@ -150,6 +160,7 @@ func depthFirstSearch(target string, container *ElementContainer) *TreeNode {
 	if container.IsVisited[target] {
 		return &TreeNode{
 			Name:  target,
+			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
 		}
@@ -174,6 +185,7 @@ func depthFirstSearch(target string, container *ElementContainer) *TreeNode {
 		if left != nil && right != nil {
 			return &TreeNode{
 				Name:  target,
+				Image: container.ElementImage[target],
 				Left:  left,
 				Right: right,
 			}

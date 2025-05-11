@@ -26,6 +26,7 @@ type ElementContainer struct {
 
 type TreeNode struct {
 	Name     string
+	Image	 string
 	Left     *TreeNode
 	Right    *TreeNode
 }
