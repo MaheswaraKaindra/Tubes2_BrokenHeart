@@ -41,7 +41,7 @@ func fetchRealImageURL(elementURL string) string {
 	}
 
 	// Try to find the element image in the infobox or main content
-	// First look for the infobox image
+	// Look for the infobox image
 	imgURL, exists := doc.Find(".pi-image img").First().Attr("src")
 	if !exists || strings.Contains(imgURL, "data:image/gif;base64") {
 		// Try to find an image in the main content
@@ -101,7 +101,6 @@ func main() {
 		
 		// Process each row in the table
 		elementTable.Find("tr").Each(func(j int, row *goquery.Selection) {
-			// Skip header rows (usually the first row)
 			if j == 0 {
 				return
 			}
@@ -111,7 +110,6 @@ func main() {
 			link := nameCell.Find("a").First()
 			name := strings.TrimSpace(link.Text())
 			
-			// Skip empty names
 			if name == "" {
 				return
 			}
@@ -126,7 +124,6 @@ func main() {
 			// Get image URL from the image tag, but filter out placeholder GIFs
 			imgSrc, exists := nameCell.Find("img").Attr("src")
 			if !exists || strings.Contains(imgSrc, "data:image/gif;base64") {
-				// If no image or it's a placeholder, create a URL for the element's wiki page to get it later
 				if href != "" {
 					imgSrc = "https://little-alchemy.fandom.com" + href
 				} else {
@@ -142,7 +139,7 @@ func main() {
 		})
 	})
 
-	// If the above approach fails, try a more direct approach to find all element links
+	// If the previous approach fails, try a more direct approach to find all element links
 	if len(elements) == 0 {
 		fmt.Println("Using alternative approach to find elements...")
 		
@@ -200,7 +197,7 @@ func main() {
 
 	fmt.Printf("Found %d unique elements\n", len(finalElements))
 	
-	// Try to fetch real image URLs for elements (with a limit to avoid too many requests)
+	// Try to fetch real image URLs for elements (with a limit)
 	maxImagesToFetch := 10
 	fetchCount := 0
 	
@@ -222,7 +219,6 @@ func main() {
 				finalElements[i].ImageURL = realImageURL
 				fmt.Printf("Found image for %s: %s\n", finalElements[i].Name, realImageURL)
 			} else {
-				// If we can't get a real image, use a generic one or clear it
 				finalElements[i].ImageURL = ""
 			}
 			fetchCount++
