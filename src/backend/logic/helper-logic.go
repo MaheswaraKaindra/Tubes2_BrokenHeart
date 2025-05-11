@@ -1,4 +1,4 @@
-package main
+package logic 
 
 func isBaseElement(name string) bool {
 	switch name {
