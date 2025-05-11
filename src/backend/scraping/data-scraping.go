@@ -1,4 +1,4 @@
-package main
+package scraping
 
 import (
 	"encoding/json"
@@ -181,7 +181,7 @@ func GetAllRecipes(elements []Element) ([]Recipe, error) {
 	return allRecipes, nil
 }
 
-func main() {
+func dataScraping(outputPath string) {
 	fmt.Println("Starting scraping...")
 	scrapeData()
 
@@ -195,7 +195,6 @@ func main() {
 		log.Fatalf("Failed to fetch recipes: %v", err)
 	}
 
-	outputPath := filepath.Join("..", "data", "recipes.json")
 	file, err := os.Create(outputPath)
 	if err != nil {
 		log.Fatalf("Cannot create file: %v", err)

@@ -1,4 +1,4 @@
-package main
+package scraping
 
 import (
 	"encoding/json"
@@ -18,14 +18,6 @@ type ElementTier struct {
 	Name string `json:"name"`
 	URL  string `json:"url"`
 	Tier int    `json:"tier"`
-}
-
-func getDirectory() string {
-	_, filename, _, ok := runtime.Caller(0)
-	if !ok {
-		log.Fatal("Invalid file path.")
-	}
-	return filepath.Join(filepath.Dir(filepath.Dir(filename)), "data")
 }
 
 func saveTier(path string, tierMap map[string]int) error {
@@ -120,7 +112,7 @@ func scrapeTier() ([]ElementTier, error) {
 	return items, nil
 }
 
-func scrapeData() {
+func scrapeData(outputPath string) {
 	items, err := scrapeTier()
 	if err != nil {
 		log.Fatalf("Failed to scrape: %v", err)
@@ -131,7 +123,6 @@ func scrapeData() {
 		tierMap[item.Name] = item.Tier
 	}
 
-	outputPath := filepath.Join(getDirectory(), "tiers.json")
 	if err := saveTier(outputPath, tierMap); err != nil {
 		log.Fatalf("Failed to save: %v", err)
 	}
