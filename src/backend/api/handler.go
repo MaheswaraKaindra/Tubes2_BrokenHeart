@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
-
-	"backend/logic"
+	"path/filepath"
 )
+
+import "github.com/MaheswaraKaindra/Tubes2_BrokenHeart/src/backend/logic"
 
 type SearchRequest struct {
 	Target string `json:"target"`
@@ -22,29 +22,15 @@ func enableCors(w http.ResponseWriter) {
 }
 
 // Utility: Load container from JSON files
-func loadElementContainer() (*logic.ElementContainer, error) {
-	// Read recipes.json
-	recipesData, err := os.ReadFile("../data/recipes.json")
+func loadElementContainerFromFiles() (*logic.ElementContainer, error) {
+	recipesPath := filepath.Join(".", "data", "recipes.json")
+	tiersPath := filepath.Join(".", "data", "tiers.json")
+	
+	elements, err := logic.ReadJSON(recipesPath, tiersPath)
 	if err != nil {
 		return nil, err
 	}
-		// Read tiers.json
-	tiersData, err := os.ReadFile("../data/tiers.json")
-	if err != nil {
-		return nil, err
-	}
-
-	// Unmarshal into container structure
-	var container logic.ElementContainer
-	if err := json.Unmarshal(recipesData, &container.Container); err != nil {
-		return nil, err
-	}
-	if err := json.Unmarshal(tiersData, &container.ElementTier); err != nil {
-		return nil, err
-	}
-
-	container.IsVisited = make(map[string]bool)
-
+	container := logic.BuildElementContainer(elements)
 	return &container, nil
 }
 
@@ -64,7 +50,7 @@ func bfsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	container, err := loadElementContainer()
+	container, err := loadElementContainerFromFiles()
 	if err != nil {
 		http.Error(w, "Error loading data: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -92,7 +78,7 @@ func dfsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	container, err := loadElementContainer()
+	container, err := loadElementContainerFromFiles()
 	if err != nil {
 		http.Error(w, "Error loading data: "+err.Error(), http.StatusInternalServerError)
 		return

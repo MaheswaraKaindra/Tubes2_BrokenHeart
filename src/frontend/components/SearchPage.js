@@ -119,12 +119,14 @@ const handleSubmit = async () => {
           <div className=' px-10 py-5 text-center flex flex-col gap-5 items-center justify-center w-full h-full rounded-2xl bg-purple-light shadow-dark-light text-2xl'>   
             Here are the recipes to find: 
           </div>
-          <div className='mb-10'>
-            <ElementCard 
-            picture={Dummy} 
-            name={"Wattah"}
-            />            
-          </div>
+          {result && (
+            <div className='mb-10'>
+              <ElementCard 
+                picture={Dummy}
+                name={result.Name}
+              />
+            </div>
+          )}
 
           {/* kalau shortest, lgsg tampilin result treenya */}
           {!isToggled && (
