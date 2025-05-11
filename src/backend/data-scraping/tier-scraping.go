@@ -20,6 +20,14 @@ type ElementTier struct {
 	Tier int    `json:"tier"`
 }
 
+func getDirectory() string {
+	_, filename, _, ok := runtime.Caller(0)
+	if !ok {
+		log.Fatal("Invalid file path.")
+	}
+	return filepath.Join(filepath.Dir(filepath.Dir(filename)), "data")
+}
+
 func saveTier(path string, tierMap map[string]int) error {
 	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
 		return err
@@ -34,14 +42,6 @@ func saveTier(path string, tierMap map[string]int) error {
 	return enc.Encode(tierMap)
 }
 
-func getDirectory() string {
-	_, filename, _, ok := runtime.Caller(0)
-	if !ok {
-		log.Fatal("Invalid file path.")
-	}
-	return filepath.Join(filepath.Dir(filepath.Dir(filename)), "data")
-}
-
 func scrapeTier() ([]ElementTier, error) {
 	const url = "https://little-alchemy.fandom.com/wiki/Elements_%28Little_Alchemy_2%29"
 
@@ -53,19 +53,19 @@ func scrapeTier() ([]ElementTier, error) {
 	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status %d", res.StatusCode)
+		return nil, fmt.Errorf("Unexpected %d", res.StatusCode)
 	}
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
-		return nil, fmt.Errorf("parse HTML: %w", err)
+		return nil, fmt.Errorf("Parse HTML: %w", err)
 	}
 
 	var items []ElementTier
 
-	sel := doc.Find("div.mw-parser-output > h3")
+	tempContainer := doc.Find("div.mw-parser-output > h3")
 
-	sel.Each(func(i int, h3 *goquery.Selection) {
+	tempContainer.Each(func(i int, h3 *goquery.Selection) {
 		span := h3.Find("span.mw-headline")
 		hdr := strings.TrimSpace(span.Text())
 
@@ -78,7 +78,7 @@ func scrapeTier() ([]ElementTier, error) {
 		if len(parts) < 2 {
 			return
 		}
-		tierNum, err := strconv.Atoi(parts[1])
+		tierNumber, err := strconv.Atoi(parts[1])
 		if err != nil {
 			return
 		}
@@ -91,6 +91,7 @@ func scrapeTier() ([]ElementTier, error) {
 			return
 		}
 
+		// TableMAXXING.
 		rows := sib.Find("tr")
 		rows.Each(func(j int, row *goquery.Selection) {
 			if row.Find("th").Length() > 0 {
@@ -108,13 +109,13 @@ func scrapeTier() ([]ElementTier, error) {
 			items = append(items, ElementTier{
 				Name: name,
 				URL:  "https://little-alchemy.fandom.com" + href,
-				Tier: tierNum,
+				Tier: tierNumber,
 			})
 		})
 	})
 
 	if len(items) == 0 {
-		return nil, fmt.Errorf("no items found")
+		return nil, nil
 	}
 	return items, nil
 }
@@ -122,7 +123,7 @@ func scrapeTier() ([]ElementTier, error) {
 func scrapeData() {
 	items, err := scrapeTier()
 	if err != nil {
-		log.Fatalf("Gagal scraping: %v", err)
+		log.Fatalf("Failed to scrape: %v", err)
 	}
 
 	tierMap := make(map[string]int)
@@ -132,8 +133,8 @@ func scrapeData() {
 
 	outputPath := filepath.Join(getDirectory(), "tiers.json")
 	if err := saveTier(outputPath, tierMap); err != nil {
-		log.Fatalf("Gagal menyimpan data: %v", err)
+		log.Fatalf("Failed to save: %v", err)
 	}
 
-	fmt.Printf("✅ %d elemen berhasil disimpan ke %s\n", len(tierMap), outputPath)
+	fmt.Printf("%d elements was saved to %s.\n", len(tierMap), outputPath)
 }

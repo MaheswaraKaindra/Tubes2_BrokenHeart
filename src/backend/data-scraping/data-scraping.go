@@ -119,11 +119,12 @@ func ElementPage(element Element, validElements map[string]bool) ([][]string, er
 	var combinations [][]string
 	found := false
 
-	doc.Find("h3").EachWithBreak(func(i int, s *goquery.Selection) bool {
-		if strings.Contains(s.Find(".mw-headline").Text(), "Little Alchemy 2") {
+	doc.Find("h3").EachWithBreak(func(i int, selection *goquery.Selection) bool {
+		if strings.Contains(selection.Find(".mw-headline").Text(), "Little Alchemy 2") {
 			found = true
-			ul := s.NextFiltered("ul").First()
+			ul := selection.NextFiltered("ul").First()
 			if ul != nil {
+				// Web structure T_T.
 				ul.Find("li").Each(func(i int, li *goquery.Selection) {
 					var combo []string
 					li.Find("a").Each(func(i int, a *goquery.Selection) {
@@ -133,6 +134,7 @@ func ElementPage(element Element, validElements map[string]bool) ([][]string, er
 						}
 					})
 					if len(combo) >= 2 && validElements[combo[0]] && validElements[combo[1]] {
+						// Intinya nambahin di sini.
 						combinations = append(combinations, combo[:2])
 					}
 				})
