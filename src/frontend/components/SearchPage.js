@@ -8,34 +8,13 @@ import Image from 'next/image'
 import Dummy from '../public/water.png'
 import TreeVisualizer from "@/components/TreeVisualizer";
 
-
-const dummyTree = {
-  name: 'Root',
-  left: {
-    name: 'Left Child',
-    left: {
-      name: 'Left-Left Child',
-    },
-    right: {
-      name: 'Left-Right Child',
-    },
-  },
-  right: {
-    name: 'Right Child',
-    left: {
-      name: 'Right-Left Child',
-    },
-    right: {
-      name: 'Right-Right Child',
-    },
-  },
-};
-
 export const SearchPage = (algorithm) => {
   const [isToggled, setIsToggled] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [input, setInput] = useState("");
-const [result, setResult] = useState(null);
+  const [result, setResult] = useState(null);
+  const [maxResults, setMaxResults] = useState(null);
+
 
 const handleSubmit = async () => {
   // const endpoint = algoritm
@@ -104,50 +83,66 @@ const handleSubmit = async () => {
 
           {/* toggle */}
           <div className='flex justify-center items-center gap-5 w-full font-monts text-purple-dark'>
-          <div className='flex items-center justify-center gap-2'>
-            <div className='text-center '>Shortest Route</div>
-            <button
-            onClick={handleToggle}
-            className={`w-14 h-8 flex items-center rounded-full p-1 transition-colors duration-300 ${
-              isToggled ? "bg-purple-dark" : "bg-purple-light"
-            } focus:outline-none`}
-            >
-            <div
-              className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ${
-              isToggled ? "translate-x-6" : "translate-x-0"
-              }`}
-            />
-            </button>
-            <div className='text-center text-sm'>Multiple Recipes</div>            
+              <div className='flex items-center justify-center gap-2'>
+                <div className='text-center '>Shortest Route</div>
+                  <button
+                  onClick={handleToggle}
+                  className={`w-14 h-8 flex items-center rounded-full p-1 transition-colors duration-300 ${
+                    isToggled ? "bg-purple-dark" : "bg-purple-light"
+                  } focus:outline-none`}
+                  >
+                  <div
+                    className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ${
+                    isToggled ? "translate-x-6" : "translate-x-0"
+                    }`}
+                  />
+                  </button>
+                  <div className='text-center text-sm'>Multiple Recipes</div>            
+                  </div>
+                  {isToggled &&
+                  <div>
+                  <form
+                  className="flex items-center justify-center gap-5 w-full font-monts"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const value = e.target.elements.maxResults.value;
+                      if (!isNaN(value) && Number.isInteger(Number(value))) {
+                        const num = Number(value);
+                        if (result && num > result.length) {
+                          alert(`Please enter a value less than or equal to ${result.length}.`);
+                        } else {
+                          setMaxResults(num); // ✅ store in state
+                          console.log("Max Results:", num);
+                        }
+                      } else {
+                        alert("Please enter a valid integer.");
+                      }
+                    }}>
+                  <input
+                    type="text"
+                    name="maxResults"
+                    placeholder="Enter max. results"
+                    className="rounded-full max-w-[300px] p-2 text-center text-sm bg-purple-light shadow-lg focus:outline-none focus:ring-0"
+                  />
+                  <button
+                    type="submit"
+                    className="bg-purple-dark text-white text-sm font-monts px-4 py-2 rounded-full shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out focus:outline-none focus:border-2 focus:border-[#380028]"
+                  >
+                    Submit
+                  </button>
+                </form> 
+              </div>}
           </div>
-          {isToggled &&
-          <div>
-            <form
-            className="flex items-center justify-center gap-5 w-full font-monts"
-            onSubmit={(e) => {
-              e.preventDefault();
-              // Nanti masuk logic search
-            }}>
-            <input
-              type="text"
-              placeholder="Enter max. results"
-              className="rounded-full max-w-[300px] p-2 text-center text-sm bg-purple-light shadow-lg focus:outline-none focus:ring-0"
-            />
-            <button
-              type="submit"
-              className="bg-purple-dark text-white text-sm font-monts px-4 py-2 rounded-full shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out focus:outline-none focus:border-2 focus:border-[#380028]"
-            >
-              Submit
-            </button>
-          </form> 
-        </div>}
-      </div>
 
 
       {/* result */}
       <div className='w-full font-bold flex flex-col items-center justify-center gap-10 font-monts text-purple-dark mt-10 '>
           <div className=' px-10 py-5 text-center flex flex-col gap-5 items-center justify-center w-full h-full rounded-2xl bg-purple-light shadow-dark-light text-2xl'>   
-            Here are the recipes to find: 
+            {result ? (
+              "Here are the recipes to find:"
+            ) : (
+              "There are no results yet!"
+            )}
           </div>
           {result && !isToggled && (
             <div className='mb-10'>
@@ -176,8 +171,8 @@ const handleSubmit = async () => {
           )}
 
           {/* kalau multiple, lgsg tampilin result treenya */}
-          {isToggled &&(
-          <MultipleResultCard result = {result}/>)
+          {result && isToggled &&(
+          <MultipleResultCard result = {result} max = {maxResults}/>)
           }
 
       </div>
