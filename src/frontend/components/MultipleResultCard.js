@@ -35,8 +35,8 @@ export const MultipleResultCard = ({result}) => {
         result.recipes.map((item, index) => (
           <CombinationCard
             key={item.id || index}
-            name1={item[0]}
-            name2={item[1]}
+            name1={item.Component1}
+            name2={item.Component2}
             onClick={() => setSelectedIndex(index)}
           />
         ))
@@ -47,7 +47,7 @@ export const MultipleResultCard = ({result}) => {
               <div className='w-full h-full flex items-center justify-center'>
                 {result?.trees && result.trees[selectedIndex] ? (
                   <TreeVisualizer
-                    data={result.trees[selectedIndex]}
+                    tree={result.trees[selectedIndex]}
                   />
                 ) : (
                   <div className='text-center text-white'>Tree data not available</div>
