@@ -22,11 +22,11 @@ export const SearchPage = (algorithm) => {
   }, [isToggled]);
 
 const handleSubmit = async () => {
-  // const endpoint = algoritm
   let endpoint = algorithm.algorithm === "bfs" ? "bfs" : "dfs";
   if (isToggled) {
     endpoint += "multiple";
   }
+  console.log("Endpoint:", endpoint);
 
   try {
     const res = await fetch(`http://localhost:8080/api/${endpoint}`, {
@@ -114,7 +114,7 @@ const handleSubmit = async () => {
                       if (!isNaN(value) && Number.isInteger(Number(value))) {
                         const num = Number(value);
                         if (result && num > result.recipes.length) {
-                          alert(`Please enter a value less than or equal to ${result.recipes.length}.`);
+                          alert(`We're sorry, the maximum number of recipes provided is ${result.recipes.length}.`);
                         } else {
                           setMaxResults(num);
                           console.log("Max Results:", num);
@@ -142,30 +142,36 @@ const handleSubmit = async () => {
 
 
       {/* result */}
-      <div className='w-full font-bold flex flex-col items-center justify-center gap-10 font-monts text-purple-dark mt-10 '>
-          <div className=' px-10 py-5 text-center flex flex-col gap-5 items-center justify-center w-full h-full rounded-2xl bg-purple-light shadow-dark-light text-2xl'>   
-            {result ? (
-              "Here are the recipes to find:"
+        <div className='w-full font-bold flex flex-col items-center justify-center gap-10 font-monts text-purple-dark mt-10 '>
+            <div className='px-10 py-5 text-center flex flex-col gap-5 items-center justify-center w-full h-full rounded-2xl bg-purple-light shadow-dark-light text-2xl'>   
+            {input && !result ? (
+              "Sorry, the element you've entered is not valid! Please recheck your input."
+            ) : result && !isToggled ? (
+              "Here's the shortest recipe to find:"
+            ) : result && isToggled && Array.isArray(result.trees) && result.trees.length > 0 ? (
+              "Here are the available recipes to find:"
+            ) : input && result && isToggled && Array.isArray(result.trees) && result.trees.length === 0 ? (
+              "Sorry, no available recipes found for this element!"
             ) : (
-              "There are no results yet!"
+              "Please input your element!"
             )}
+            </div> 
+            {result && !isToggled && (
+          <div className='mb-10'>
+            <ElementCard 
+              picture={`/data/${result.Name}.svg`}
+              name={result.Name}
+            />
           </div>
-          {result && !isToggled && (
-            <div className='mb-10'>
-              <ElementCard 
-                picture={`/data/${result.Name}.svg`}
-                name={result.Name}
-              />
-            </div>
-          )}
+            )}
 
           {result && isToggled && Array.isArray(result.trees) && result.trees.length > 0 &&  (
-            <div className='mb-10'>
-              <ElementCard 
-                picture={`/data/${result.trees[0].Name}.svg`}
-                name={result.trees[0].Name}
-              />
-            </div>
+          <div className='mb-10'>
+            <ElementCard 
+              picture={`/data/${result.trees[0].Name}.svg`}
+              name={result.trees[0].Name}
+            />
+          </div>
           )}
 
           {/* TAMBAHIN ANOTHER RULE, KLO ADA RESULT BARU MUNCULIN */}
@@ -177,10 +183,15 @@ const handleSubmit = async () => {
           )}
 
           {/* kalau multiple, lgsg tampilin result treenya */}
-          {result && isToggled &&(
-          <MultipleResultCard result = {result} max = {maxResults}/>)
-          }
-
+          {result && isToggled && Array.isArray(result.trees) && result.trees.length > 0 ? (
+            <>
+              <MultipleResultCard result={result} max={maxResults} />
+            </>
+          ) : result && isToggled ? (
+              <div className='text-xl font-semibold text-center'>
+                Sorry, no available recipes found for this element, please recheck the element you've entered!
+              </div>
+          ) : null}
       </div>
     </div>
   )

@@ -8,7 +8,7 @@ export const ElementCard = ({ picture, name }) => {
       {picture && (
         <Image
           src={picture}
-          alt={name}
+          alt={name? name : "Image"}
           width={100}
           height={100}
           className='rounded-2xl w-full shadow-sm'

@@ -11,7 +11,7 @@ export const MultipleResultCard = ({ result, max }) => {
       {selectedIndex === null && Array.isArray(result?.recipes) ? (
         <>
           <div className='text-center font-monts text-2xl font-bold text-purple-dark'>
-            Click one of the following to see the Tree of the selected recipe!
+            Click one of the following to see the visualized Tree of the selected recipe!
           </div>
           {result.recipes.slice(0, max ?? result.recipes.length).map((item, index) => (
             <CombinationCard
