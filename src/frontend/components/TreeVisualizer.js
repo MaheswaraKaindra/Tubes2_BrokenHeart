@@ -26,6 +26,13 @@ const TreeVisualizer = ({ tree }) => {
         id,
         data: { label: node.Name },
         position: { x: 0, y: 0 }, 
+          style: {
+          backgroundColor: '#801669', 
+          border: '1px solid #999',
+          borderRadius: '8px',
+          padding: '10px',
+          color: '#ffffff'
+        },
       });
 
       dagreGraph.setNode(id, { width: nodeWidth, height: nodeHeight });
@@ -62,10 +69,16 @@ const TreeVisualizer = ({ tree }) => {
   const { nodes, edges } = useMemo(() => treeToFlow(tree), [tree]);
 
   return (
-    <div style={{ width: '100%', height: '500px', border: '2px solid #ccc' }}>
+    <div style={{ 
+      width: '100%', 
+      height: '500px', 
+      borderRadius: '16px',
+      overflow: 'hidden'
+       }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        style={{ backgroundColor: '#CFACBE' }}
         fitView
         defaultEdgeOptions={{
           type: 'straight',

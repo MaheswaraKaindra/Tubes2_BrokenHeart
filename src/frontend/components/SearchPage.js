@@ -1,5 +1,5 @@
 "use client"
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import React from 'react'
 import { ElementCard } from '@/components/ElementCard'
 import { MultipleResultCard } from './MultipleResultCard'
@@ -15,6 +15,11 @@ export const SearchPage = (algorithm) => {
   const [result, setResult] = useState(null);
   const [maxResults, setMaxResults] = useState(null);
 
+  useEffect(() => {
+    setResult(null);
+    setMaxResults(null);
+    setInput("");
+  }, [isToggled]);
 
 const handleSubmit = async () => {
   // const endpoint = algoritm
@@ -22,7 +27,7 @@ const handleSubmit = async () => {
   if (isToggled) {
     endpoint += "multiple";
   }
-  // const endpoint = isToggled ? "bfs" : "dfs";
+
   try {
     const res = await fetch(`http://localhost:8080/api/${endpoint}`, {
       method: "POST",
@@ -108,11 +113,12 @@ const handleSubmit = async () => {
                       const value = e.target.elements.maxResults.value;
                       if (!isNaN(value) && Number.isInteger(Number(value))) {
                         const num = Number(value);
-                        if (result && num > result.length) {
-                          alert(`Please enter a value less than or equal to ${result.length}.`);
+                        if (result && num > result.recipes.length) {
+                          alert(`Please enter a value less than or equal to ${result.recipes.length}.`);
                         } else {
-                          setMaxResults(num); // ✅ store in state
+                          setMaxResults(num);
                           console.log("Max Results:", num);
+                          console.log("Result:", result, "Length:", result?.recipes.length, "Num:", num);
                         }
                       } else {
                         alert("Please enter a valid integer.");
@@ -147,16 +153,16 @@ const handleSubmit = async () => {
           {result && !isToggled && (
             <div className='mb-10'>
               <ElementCard 
-                // picture={result.Image}
+                picture={`/data/${result.Name}.svg`}
                 name={result.Name}
               />
             </div>
           )}
 
-          {result && isToggled && (
+          {result && isToggled && Array.isArray(result.trees) && result.trees.length > 0 &&  (
             <div className='mb-10'>
               <ElementCard 
-                // picture={result.Image}
+                picture={`/data/${result.trees[0].Name}.svg`}
                 name={result.trees[0].Name}
               />
             </div>
