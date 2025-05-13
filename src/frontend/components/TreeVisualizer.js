@@ -54,8 +54,7 @@ const TreeVisualizer = ({ tree }) => {
     traverse(tree);
 
     dagre.layout(dagreGraph);
-
-    // Apply layouted positions
+    
     nodes.forEach((node) => {
       const pos = dagreGraph.node(node.id);
       node.position = { x: pos.x, y: pos.y };

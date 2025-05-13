@@ -3,14 +3,10 @@ import { useState, useEffect } from 'react'
 import React from 'react'
 import { ElementCard } from '@/components/ElementCard'
 import { MultipleResultCard } from './MultipleResultCard'
-import { CombinationCard } from '@/components/CombinationCard'
-import Image from 'next/image'
-import Dummy from '../public/water.png'
 import TreeVisualizer from "@/components/TreeVisualizer";
 
 export const SearchPage = ({algorithm}) => {
   const [isToggled, setIsToggled] = useState(false);
-  const [isClicked, setIsClicked] = useState(false);
   const [input, setInput] = useState("");
   const [result, setResult] = useState(null);
   const [maxResults, setMaxResults] = useState(null);
@@ -34,7 +30,7 @@ const handleSubmit = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ target: input, index: 0 }), // Add index if needed
+      body: JSON.stringify({ target: input, index: 0 }),
     });
 
     if (!res.ok) {
