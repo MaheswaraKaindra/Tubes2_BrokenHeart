@@ -15,7 +15,15 @@ func BreadthFirstSearch(target string, container *ElementContainer, index int) *
 	queue := make(chan *TreeNode, 100)
 	var wg sync.WaitGroup
 
-	root := &TreeNode{Name: target, Image: container.ElementImage[target]}
+	var root *TreeNode
+	if _, exists := container.Container[target]; !exists {
+		if !isBaseElement(target) {
+			return nil
+		}
+	} else {
+		root = &TreeNode{Name: target, Image: container.ElementImage[target]}
+	}
+
 	queue <- root
 	first := true
 
@@ -94,7 +102,14 @@ func ShortestBreadthFirstSearch(target string, container *ElementContainer) *Tre
 	queue := make(chan *TreeNode, 100)
 	var wg sync.WaitGroup
 
-	root := &TreeNode{Name: target, Image: container.ElementImage[target]}
+	var root *TreeNode
+	if _, exists := container.Container[target]; !exists {
+		if !isBaseElement(target) {
+			return nil
+		}
+	} else {
+		root = &TreeNode{Name: target, Image: container.ElementImage[target]}
+	}
 	queue <- root
 
 	wg.Add(1)

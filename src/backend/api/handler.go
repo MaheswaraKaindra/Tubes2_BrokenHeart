@@ -11,6 +11,8 @@ import (
 	"time"
 	"runtime"
 	"strconv"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 import "github.com/MaheswaraKaindra/Tubes2_BrokenHeart/src/backend/logic"
