@@ -10,7 +10,7 @@ import (
 // Untuk enqueue : queue.PushBack(node)
 // Untuk dequeue : queue.Remove(queue.Front()), bisa simpan ke value jika butuh.
 
-func BreadthFirstSearch(target string, container *ElementContainer, index int) *TreeNode {
+func BreadthFirstSearch(target string, container *ElementContainer, index int) (*TreeNode, int) {
 	target = strings.ToLower(target)
 	queue := make(chan *TreeNode, 100)
 	var wg sync.WaitGroup
@@ -18,7 +18,7 @@ func BreadthFirstSearch(target string, container *ElementContainer, index int) *
 	var root *TreeNode
 	if _, exists := container.Container[target]; !exists {
 		if !isBaseElement(target) {
-			return nil
+			return nil, 0
 		}
 	} else {
 		root = &TreeNode{Name: target, Image: container.ElementImage[target]}
@@ -27,9 +27,16 @@ func BreadthFirstSearch(target string, container *ElementContainer, index int) *
 	queue <- root
 	first := true
 
+	visitedCount:= 0
+	var mu sync.Mutex
+
 	wg.Add(1)
 	go func() {
 		for parentNode := range queue {
+			mu.Lock()
+			visitedCount++
+			mu.Unlock()
+
 			pairs := container.Container[parentNode.Name]
 			if len(pairs) == 0 {
 				wg.Done()
@@ -94,10 +101,10 @@ func BreadthFirstSearch(target string, container *ElementContainer, index int) *
 	wg.Wait()
 	close(queue)
 
-	return root
+	return root, visitedCount
 }
 
-func ShortestBreadthFirstSearch(target string, container *ElementContainer) *TreeNode {
+func ShortestBreadthFirstSearch(target string, container *ElementContainer) (*TreeNode, int) {
 	target = strings.ToLower(target)
 	queue := make(chan *TreeNode, 100)
 	var wg sync.WaitGroup
@@ -105,16 +112,24 @@ func ShortestBreadthFirstSearch(target string, container *ElementContainer) *Tre
 	var root *TreeNode
 	if _, exists := container.Container[target]; !exists {
 		if !isBaseElement(target) {
-			return nil
+			return nil, 0
 		}
 	} else {
 		root = &TreeNode{Name: target, Image: container.ElementImage[target]}
 	}
 	queue <- root
 
+		visitedCount:= 0
+		var mu sync.Mutex
+
 	wg.Add(1)
 	go func() {
 		for parentNode := range queue {
+
+			mu.Lock()
+			visitedCount++
+			mu.Unlock()
+
 			pairs := container.Container[parentNode.Name]
 			if len(pairs) == 0 {
 				wg.Done()
@@ -181,5 +196,5 @@ func ShortestBreadthFirstSearch(target string, container *ElementContainer) *Tre
 	wg.Wait()
 	close(queue)
 
-	return root
+	return root, visitedCount
 }
