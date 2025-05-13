@@ -1,4 +1,4 @@
-# 🧪 Tubes2-BrokenHeart
+# 💔 Tubes2-BrokenHeart
 
 ![Next.js](https://img.shields.io/badge/Next.js-13+-000000?logo=nextdotjs&logoColor=white)
 ![Golang](https://img.shields.io/badge/Golang-1.20+-00ADD8?logo=go&logoColor=white)
@@ -44,7 +44,7 @@ Buka link Deployment pada bagian samping repositori.
    npm run dev
    Akses link melalui localhost 3000.
 
-## 🛠️ Daftar Fitur
+## Daftar Fitur
 
 | Fitur                                                   | Penanggung Jawab       | NIM            |
 |----------------------------------------------------------|--------------------------|----------------|
