@@ -1,5 +1,34 @@
 import Image from "next/image";
 import Link from "next/link";
+import ProfileCard from "@/components/ProfileCard";
+
+
+const Profile = [
+  {
+    name: "Maheswara Bayu Kaindra",
+    nim: "13523015",
+    pesan: "''Ini momen pertamaku mengeksplorasi hal yang sangat jauh dari pengetahuanku, menurutku tugas ini workloadnya terlalu berat, jauh melebihi batas normal. Meskipun begitu, tugas masih bisa diselesaikan tepat waktu, karena aku jago.''",
+    img: "/fotoindra.jpg",
+    bg: "purple-light",
+    link:"https://www.linkedin.com/in/maheswarakaindra/"
+  },
+  {
+    name: "Jessica Allen",
+    nim: "13523059",
+    pesan: "''Ternyata handling API and frontend bersamaan sangat seru.''",
+    img: "/fotoallen.jpg",
+    bg: "purple-dark-light",
+    link:"https://www.linkedin.com/in/jessica-allen-lim/"
+  },
+  {
+    name: "Shanice Feodora Tjahjono",
+    nim: "13523097",
+    pesan: "''-''",
+    img: "/water.png",
+    bg: "purple-dark",
+    link:"https://www.linkedin.com/in/shanice-feodora-a8368124b/"
+  }
+]
 
 export default function Home() {
   return (
@@ -23,6 +52,16 @@ export default function Home() {
             </button>
           </Link>
         </div>
+
+      <div className="p-10 max-w-[1000px] flex flex-col items-center mx-auto">
+        <div className="mt-20 text-4xl font-monts font-extrabold text-center mb-4 text-purple-dark p-5">Brought to you by...</div>
+        <div className="flex flex-col justify-center items-center ">
+          {Profile.map((person, index) => (
+            <ProfileCard key={index} data={person} />
+          ))}          
+        </div>
+
+      </div>
       </main>
     </div>
   );
