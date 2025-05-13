@@ -1,8 +1,9 @@
 package logic
 
 import (
-	"container/list"
+	// "container/list", gak jadi dipakai.
 	"strings"
+	"sync"
 	// "fmt"
 )
 
@@ -11,35 +12,107 @@ import (
 
 func BreadthFirstSearch(target string, container *ElementContainer, index int) *TreeNode {
 	target = strings.ToLower(target)
-	queue := list.New()
+	queue := make(chan *TreeNode, 100)
+	var wg sync.WaitGroup
 
 	root := &TreeNode{Name: target, Image: container.ElementImage[target]}
-	queue.PushBack(root)
-
+	queue <- root
 	first := true
 
-	for queue.Len() > 0 {
-		element := queue.Front()
-		queue.Remove(element)
+	wg.Add(1)
+	go func() {
+		for parentNode := range queue {
+			pairs := container.Container[parentNode.Name]
+			if len(pairs) == 0 {
+				wg.Done()
+				continue
+			}
 
-		parentNode := element.Value.(*TreeNode)
+			i := index
+			if !first {
+				shortestMap := make(map[int]int)
+				j := 0
+				for _, pair := range pairs {
+					t1, ok1 := container.ElementTier[pair.Component1]
+					t2, ok2 := container.ElementTier[pair.Component2]
+					tTarget, okT := container.ElementTier[parentNode.Name]
+					if !ok1 || !ok2 || !okT {
+						j++
+						continue
+					}
+					if t1 >= tTarget || t2 >= tTarget {
+						j++
+						continue
+					}
+					shortestMap[j] = t1 + t2
+					j++
+				}
+				i = minKey(shortestMap)
+			}
 
-		pairs := container.Container[parentNode.Name]
-		if len(pairs) == 0 {
-			continue
+			pair := pairs[i]
+			leftName := pair.Component1
+			rightName := pair.Component2
+
+			if leftName == parentNode.Name || rightName == parentNode.Name {
+				wg.Done()
+				continue
+			}
+
+			leftNode := &TreeNode{Name: leftName, Image: container.ElementImage[leftName]}
+			rightNode := &TreeNode{Name: rightName, Image: container.ElementImage[rightName]}
+
+			if !isBaseElement(leftName) {
+				parentNode.Left = leftNode
+				wg.Add(1)
+				queue <- leftNode
+			} else {
+				parentNode.Left = &TreeNode{Name: leftName, Image: container.ElementImage[leftName]}
+			}
+
+			if !isBaseElement(rightName) {
+				parentNode.Right = rightNode
+				wg.Add(1)
+				queue <- rightNode
+			} else {
+				parentNode.Right = &TreeNode{Name: rightName, Image: container.ElementImage[rightName]}
+			}
+
+			first = false
+			wg.Done()
 		}
+	}()
 
-		i := index
+	wg.Wait()
+	close(queue)
 
-		if !first {
+	return root
+}
+
+func ShortestBreadthFirstSearch(target string, container *ElementContainer) *TreeNode {
+	target = strings.ToLower(target)
+	queue := make(chan *TreeNode, 100)
+	var wg sync.WaitGroup
+
+	root := &TreeNode{Name: target, Image: container.ElementImage[target]}
+	queue <- root
+
+	wg.Add(1)
+	go func() {
+		for parentNode := range queue {
+			pairs := container.Container[parentNode.Name]
+			if len(pairs) == 0 {
+				wg.Done()
+				continue
+			}
+
 			shortestMap := make(map[int]int)
-			i = 0
-			for _, pair := range container.Container[parentNode.Name] {
-				// fmt.Printf("[EXPAND] %s → %s + %s\n", parentNode.Name, pair.Component1, pair.Component2)
+			i := 0
+			for _, pair := range pairs {
 				t1, ok1 := container.ElementTier[pair.Component1]
 				t2, ok2 := container.ElementTier[pair.Component2]
 				tTarget, okT := container.ElementTier[parentNode.Name]
-		
+
 				if !ok1 || !ok2 || !okT {
 					i++
 					continue
@@ -48,111 +121,50 @@ func BreadthFirstSearch(target string, container *ElementContainer, index int) *
 					i++
 					continue
 				}
-
-				shortestMap[i] = container.ElementTier[pair.Component1] + container.ElementTier[pair.Component2]
+				shortestMap[i] = t1 + t2
 				i++
 			}
-			i = minKey(shortestMap)
-		}
 
-		pair := pairs[i]
-		leftName := pair.Component1
-		rightName := pair.Component2
-		
-		if (leftName == parentNode.Name || rightName == parentNode.Name) {
-			continue
-		}
-		
-		leftNode := &TreeNode{ Name: leftName, Image: container.ElementImage[leftName] }
-		rightNode := &TreeNode{ Name: rightName, Image: container.ElementImage[rightName] }
-
-		if !isBaseElement(leftName) {
-			parentNode.Left = leftNode
-			queue.PushBack(leftNode)
-		} else {
-			parentNode.Left = &TreeNode{Name: leftName, Image: container.ElementImage[leftName]}
-		}
-		
-		if !isBaseElement(rightName) {
-			parentNode.Right = rightNode
-			queue.PushBack(rightNode)
-		} else {
-			parentNode.Right = &TreeNode{Name: rightName, Image: container.ElementImage[rightName]}
-		}
-
-		first = false
-	}
-
-	return root
-}
-
-func ShortestBreadthFirstSearch(target string, container *ElementContainer) *TreeNode {
-	target = strings.ToLower(target)
-	queue := list.New()
-
-	root := &TreeNode{Name: target, Image: container.ElementImage[target]}
-	queue.PushBack(root)
-
-	for queue.Len() > 0 {
-		element := queue.Front()
-		queue.Remove(element)
-
-		parentNode := element.Value.(*TreeNode)
-
-		pairs := container.Container[parentNode.Name]
-		if len(pairs) == 0 {
-			continue
-		}
-
-		shortestMap := make(map[int]int)
-
-		i := 0
-		for _, pair := range container.Container[parentNode.Name] {
-			// fmt.Printf("[EXPAND] %s → %s + %s\n", parentNode.Name, pair.Component1, pair.Component2)
-			t1, ok1 := container.ElementTier[pair.Component1]
-			t2, ok2 := container.ElementTier[pair.Component2]
-			tTarget, okT := container.ElementTier[parentNode.Name]
-	
-			if !ok1 || !ok2 || !okT {
-				i++
-				continue
-			}
-			if t1 >= tTarget || t2 >= tTarget {
-				i++
+			if len(shortestMap) == 0 {
+				wg.Done()
 				continue
 			}
 
-			shortestMap[i] = container.ElementTier[pair.Component1] + container.ElementTier[pair.Component2]
-			i++
-		}
+			index := minKey(shortestMap)
+			pair := pairs[index]
+			leftName := pair.Component1
+			rightName := pair.Component2
 
-		index := minKey(shortestMap)
+			if leftName == parentNode.Name || rightName == parentNode.Name {
+				wg.Done()
+				continue
+			}
 
-		pair := pairs[index]
-		leftName := pair.Component1
-		rightName := pair.Component2
-		
-		if (leftName == parentNode.Name || rightName == parentNode.Name) {
-			continue
-		}
-		
-		leftNode := &TreeNode{Name: leftName, Image: container.ElementImage[leftName]}
-		rightNode := &TreeNode{Name: rightName, Image: container.ElementImage[rightName]}
+			leftNode := &TreeNode{Name: leftName, Image: container.ElementImage[leftName]}
+			rightNode := &TreeNode{Name: rightName, Image: container.ElementImage[rightName]}
 
-		if !isBaseElement(leftName) {
-			parentNode.Left = leftNode
-			queue.PushBack(leftNode)
-		} else {
-			parentNode.Left = &TreeNode{Name: leftName, Image: container.ElementImage[leftName]}
+			if !isBaseElement(leftName) {
+				parentNode.Left = leftNode
+				wg.Add(1)
+				queue <- leftNode
+			} else {
+				parentNode.Left = &TreeNode{Name: leftName, Image: container.ElementImage[leftName]}
+			}
+
+			if !isBaseElement(rightName) {
+				parentNode.Right = rightNode
+				wg.Add(1)
+				queue <- rightNode
+			} else {
+				parentNode.Right = &TreeNode{Name: rightName, Image: container.ElementImage[rightName]}
+			}
+
+			wg.Done()
 		}
-		
-		if !isBaseElement(rightName) {
-			parentNode.Right = rightNode
-			queue.PushBack(rightNode)
-		} else {
-			parentNode.Right = &TreeNode{Name: rightName, Image: container.ElementImage[rightName]}
-		}
-	}
+	}()
+
+	wg.Wait()
+	close(queue)
 
 	return root
 }
