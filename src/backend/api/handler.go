@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
+	"time"
 )
 
 import "github.com/MaheswaraKaindra/Tubes2_BrokenHeart/src/backend/logic"
@@ -92,6 +93,7 @@ func dfsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func shortestbfsHandler(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
 	enableCors(w)
 	if r.Method == http.MethodOptions {
 		return
@@ -114,12 +116,21 @@ func shortestbfsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	root := logic.ShortestBreadthFirstSearch(req.Target, container)
+	duration := time.Since(start)
+	fmt.Printf("Target: %s, Result: %+v, Duration: %s\n", req.Target, root, duration)
+
+
+	response := map[string]interface{}{
+		"data":          root,
+		"executionTime": duration.String(),
+ 	} 	
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(root)
+	json.NewEncoder(w).Encode(response)
 }
 
 func shortestdfsHandler(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
 	enableCors(w)
 	if r.Method == http.MethodOptions {
 		return
@@ -142,12 +153,19 @@ func shortestdfsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	root := logic.ShortestDepthFirstSearch(req.Target, container)
+	duration := time.Since(start)
+
+	response := map[string]interface{}{
+		"data":          root,
+		"executionTime": duration.String(),
+ 	} 	
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(root)
+	json.NewEncoder(w).Encode(response)
 }
 
 func multiplebfsHandler(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
 	enableCors(w)
 	if r.Method == http.MethodOptions {
 		return
@@ -177,16 +195,19 @@ func multiplebfsHandler(w http.ResponseWriter, r *http.Request) {
 		tree := logic.BreadthFirstSearch(req.Target, container, i)
 		trees = append(trees, tree)
 	}
+	duration := time.Since(start)
 
 	response := map[string]interface{}{
 		"trees":   trees,
 		"recipes": recipes,
+		"executionTime": duration.String(),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
 func multipledfsHandler(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
 	enableCors(w)
 	if r.Method == http.MethodOptions {
 		return
@@ -216,10 +237,12 @@ func multipledfsHandler(w http.ResponseWriter, r *http.Request) {
 		tree := logic.FirstDepthFirstSearch(req.Target, container, i)
 		trees = append(trees, tree)
 	}
+	duration := time.Since(start)
 
 	response := map[string]interface{}{
 		"trees":   trees,
 		"recipes": recipes,
+		"executionTime": duration.String(),
 	}
 
 	w.Header().Set("Content-Type", "application/json")

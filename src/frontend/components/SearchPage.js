@@ -8,7 +8,7 @@ import Image from 'next/image'
 import Dummy from '../public/water.png'
 import TreeVisualizer from "@/components/TreeVisualizer";
 
-export const SearchPage = (algorithm) => {
+export const SearchPage = ({algorithm}) => {
   const [isToggled, setIsToggled] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [input, setInput] = useState("");
@@ -22,7 +22,7 @@ export const SearchPage = (algorithm) => {
   }, [isToggled]);
 
 const handleSubmit = async () => {
-  let endpoint = algorithm.algorithm === "bfs" ? "bfs" : "dfs";
+  let endpoint = algorithm === "bfs" ? "bfs" : "dfs";
   if (isToggled) {
     endpoint += "multiple";
   }
@@ -47,6 +47,7 @@ const handleSubmit = async () => {
     const data = await res.json();
     setResult(data);
     console.log("Tree:", data);
+    console.log("Result:", data);
   } catch (err) {
     console.error("Failed to fetch:", err);
   }
@@ -159,8 +160,8 @@ const handleSubmit = async () => {
             {result && !isToggled && (
           <div className='mb-10'>
             <ElementCard 
-              picture={`/data/${result.Name}.svg`}
-              name={result.Name}
+              picture={`/data/${result.data.Name}.svg`}
+              name={result.data.Name}
             />
           </div>
             )}
@@ -178,7 +179,13 @@ const handleSubmit = async () => {
           {/* kalau shortest, lgsg tampilin result treenya */}
           {result && !isToggled && (
             <div className='w-[1000px] h-full flex flex-col items-center justify-center gap-10'>
-              <TreeVisualizer tree={result} />
+            <div className='bg-purple-dark p-10 rounded-2xl w-full h-full flex flex-col gap-10 items-center justify-center'>
+              <TreeVisualizer tree={result.data} />
+              <div className='text-white font-monts text-lg flex justify-between w-full items-center font-semibold'>
+                <div>Processing Time: {result.executionTime}</div>
+                <div>Nodes Visited: </div>
+              </div>
+            </div>
             </div>
           )}
 

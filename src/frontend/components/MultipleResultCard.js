@@ -25,7 +25,7 @@ export const MultipleResultCard = ({ result, max }) => {
           ))}
         </>
       ) : (
-        <div className='w-full bg-purple-dark text-2xl rounded-2xl p-8 flex flex-col items-center justify-center gap-10'>
+        <div className='w-full bg-purple-dark text-2xl rounded-2xl p-8 flex flex-col items-center justify-center gap-5'>
           {selectedIndex !== null && (
             <>
             <div className='w-full h-full flex flex-col gap-10 items-center justify-center'>
@@ -37,10 +37,16 @@ export const MultipleResultCard = ({ result, max }) => {
                 picture2={`/data/${result.recipes[selectedIndex].Component2}.svg`}
               />
                 {result?.trees && result.trees[selectedIndex] ? (
-                  <TreeVisualizer
-                    key={selectedIndex}
-                    tree={structuredClone(result.trees[selectedIndex])}
-                  />
+                  <div className='rounded-2xl w-full h-full flex flex-col gap-10 items-center justify-center'>
+                    <TreeVisualizer
+                      key={selectedIndex}
+                      tree={structuredClone(result.trees[selectedIndex])}
+                    />
+                    <div className='text-white font-monts text-lg flex justify-between w-full items-center'>
+                      <div>Processing Time: {result.executionTime}</div>
+                      <div>Nodes Visited: </div>
+                    </div>
+                  </div>
                 ) : (
                   <div className='text-center text-white'>Tree data not available</div>
                 )}
@@ -48,7 +54,7 @@ export const MultipleResultCard = ({ result, max }) => {
 
               <button
                 onClick={() => setSelectedIndex(null)}
-                className='bg-white text-purple-dark px-4 py-2 rounded-lg font-semibold'
+                className='bg-white text-purple-dark px-4 py-2 rounded-lg font-semibold text-xl'
               >
                 Back
               </button>
