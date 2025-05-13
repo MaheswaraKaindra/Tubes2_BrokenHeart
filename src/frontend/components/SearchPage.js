@@ -144,61 +144,64 @@ const handleSubmit = async () => {
 
       {/* result */}
         <div className='w-full font-bold flex flex-col items-center justify-center gap-10 font-monts text-purple-dark mt-10 '>
-            <div className='px-10 py-5 text-center flex flex-col gap-5 items-center justify-center w-full h-full rounded-2xl bg-purple-light shadow-dark-light text-2xl'>   
-            {input && !result ? (
-              "Sorry, the element you've entered is not valid! Please recheck your input."
-            ) : result && !isToggled ? (
-              "Here's the shortest recipe to find:"
-            ) : result && isToggled && Array.isArray(result.trees) && result.trees.length > 0 ? (
-              "Here are the available recipes to find:"
-            ) : input && result && isToggled && Array.isArray(result.trees) && result.trees.length === 0 ? (
-              "Sorry, no available recipes found for this element!"
+          <div className='px-10 py-5 text-center flex flex-col gap-5 items-center justify-center w-full h-full rounded-2xl bg-purple-light shadow-dark-light text-2xl'>
+            {input ? (
+              !result ? (
+                "Sorry, the element you've entered is not valid! Please recheck your input."
+              ) : isToggled && Array.isArray(result?.trees) ? (
+                result.trees.length > 0 ? (
+                  "Here are the available recipes to find:"
+                ) : (
+                  "Sorry, no available recipes found for this element!"
+                )
+              ) : result?.data ? (
+                "Here's the shortest recipe to find:"
+              ) : (
+                "Sorry, the element you've entered is not valid! Please recheck your input."
+              )
             ) : (
               "Please input your element!"
             )}
-            </div> 
-            {result && !isToggled && (
-          <div className='mb-10'>
-            <ElementCard 
-              picture={`/data/${result.data.Name}.svg`}
-              name={result.data.Name}
-            />
           </div>
-            )}
 
-          {result && isToggled && Array.isArray(result.trees) && result.trees.length > 0 &&  (
-          <div className='mb-10'>
-            <ElementCard 
-              picture={`/data/${result.trees[0].Name}.svg`}
-              name={result.trees[0].Name}
-            />
-          </div>
-          )}
-
-          {/* TAMBAHIN ANOTHER RULE, KLO ADA RESULT BARU MUNCULIN */}
-          {/* kalau shortest, lgsg tampilin result treenya */}
-          {result && !isToggled && (
-            <div className='w-[1000px] h-full flex flex-col items-center justify-center gap-10'>
-            <div className='bg-purple-dark p-10 rounded-2xl w-full h-full flex flex-col gap-10 items-center justify-center'>
-              <TreeVisualizer tree={result.data} />
-              <div className='text-white font-monts text-lg flex justify-between w-full items-center font-semibold'>
-                <div>Processing Time: {result.executionTime}</div>
-                <div>Nodes Visited: </div>
-              </div>
-            </div>
-            </div>
-          )}
-
-          {/* kalau multiple, lgsg tampilin result treenya */}
-          {result && isToggled && Array.isArray(result.trees) && result.trees.length > 0 ? (
+          {result?.data && !isToggled && (
             <>
+              <div className='mb-10'>
+                <ElementCard 
+                  picture={`/data/${result.data.Name}.svg`}
+                  name={result.data.Name}
+                />
+              </div>
+
+              <div className='w-[1000px] h-full flex flex-col items-center justify-center gap-10'>
+                <div className='bg-purple-dark p-10 rounded-2xl w-full h-full flex flex-col gap-10 items-center justify-center'>
+                  <TreeVisualizer tree={result.data} />
+                  <div className='text-white font-monts text-lg flex justify-between w-full items-center font-semibold'>
+                    <div>Processing Time: {result.executionTime}</div>
+                    <div>Nodes Visited: {result.nodesVisited}</div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {isToggled && Array.isArray(result?.trees) && result.trees.length > 0 && (
+            <>
+              <div className='mb-10'>
+                <ElementCard 
+                  picture={`/data/${result.trees[0].Name}.svg`}
+                  name={result.trees[0].Name}
+                />
+              </div>
               <MultipleResultCard result={result} max={maxResults} />
             </>
-          ) : result && isToggled ? (
-              <div className='text-xl font-semibold text-center'>
-                Sorry, no available recipes found for this element, please recheck the element you've entered!
-              </div>
-          ) : null}
+          )}
+
+          {isToggled && result && Array.isArray(result.trees) && result.trees.length === 0 && (
+            <div className='text-xl font-semibold text-center'>
+              Sorry, no available recipes found for this element, please recheck the element you've entered!
+            </div>
+          )}
       </div>
     </div>
   )
