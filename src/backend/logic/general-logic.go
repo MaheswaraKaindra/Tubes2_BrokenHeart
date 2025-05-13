@@ -35,3 +35,8 @@ type SearchState struct {
 	Node   *TreeNode
 	Target string
 }
+
+type Result struct {
+	Node *TreeNode
+	VisitedCount int
+}

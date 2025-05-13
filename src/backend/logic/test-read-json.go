@@ -8,7 +8,7 @@ import (
     // "os"
 )
 
-func printTree(node *TreeNode, indent string, isLeft bool) {
+func PrintTree(node *TreeNode, indent string, isLeft bool) {
 	if node == nil {
 		return
 	}
@@ -26,8 +26,8 @@ func printTree(node *TreeNode, indent string, isLeft bool) {
 		newIndent += "    "
 	}
 
-	printTree(node.Left, newIndent, true)
-	printTree(node.Right, newIndent, false)
+	PrintTree(node.Left, newIndent, true)
+	PrintTree(node.Right, newIndent, false)
 }
 
 func printAllElements(elements []Element) {

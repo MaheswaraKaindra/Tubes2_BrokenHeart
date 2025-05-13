@@ -36,15 +36,15 @@ export const MultipleResultCard = ({ result, max }) => {
                 picture1={`/data/${result.recipes[selectedIndex].Component1}.svg`}
                 picture2={`/data/${result.recipes[selectedIndex].Component2}.svg`}
               />
-                {result?.trees && result.trees[selectedIndex] ? (
+                {result?.trees && result.trees[selectedIndex].Node ? (
                   <div className='rounded-2xl w-full h-full flex flex-col gap-10 items-center justify-center'>
                     <TreeVisualizer
                       key={selectedIndex}
-                      tree={structuredClone(result.trees[selectedIndex])}
+                      tree={structuredClone(result.trees[selectedIndex].Node)}
                     />
                     <div className='text-white font-monts text-lg flex justify-between w-full items-center'>
                       <div>Processing Time: {result.executionTime}</div>
-                      <div>Nodes Visited: </div>
+                      <div>Nodes Visited: {result.trees[selectedIndex].VisitedCount}</div>
                     </div>
                   </div>
                 ) : (

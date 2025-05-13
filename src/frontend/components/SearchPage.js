@@ -168,17 +168,17 @@ const handleSubmit = async () => {
             <>
               <div className='mb-10'>
                 <ElementCard 
-                  picture={`/data/${result.data.Name}.svg`}
-                  name={result.data.Name}
+                  picture={`/data/${result.data.Node.Name}.svg`}
+                  name={result.data.Node.Name}
                 />
               </div>
 
               <div className='w-[1000px] h-full flex flex-col items-center justify-center gap-10'>
                 <div className='bg-purple-dark p-10 rounded-2xl w-full h-full flex flex-col gap-10 items-center justify-center'>
-                  <TreeVisualizer tree={result.data} />
+                  <TreeVisualizer tree={result.data.Node} />
                   <div className='text-white font-monts text-lg flex justify-between w-full items-center font-semibold'>
                     <div>Processing Time: {result.executionTime}</div>
-                    <div>Nodes Visited: {result.nodesVisited}</div>
+                    <div>Nodes Visited: {result.data.VisitedCount}</div>
                   </div>
                 </div>
               </div>
@@ -189,8 +189,8 @@ const handleSubmit = async () => {
             <>
               <div className='mb-10'>
                 <ElementCard 
-                  picture={`/data/${result.trees[0].Name}.svg`}
-                  name={result.trees[0].Name}
+                  picture={`/data/${result.trees[0].Node.Name}.svg`}
+                  name={result.trees[0].Node.Name}
                 />
               </div>
               <MultipleResultCard result={result} max={maxResults} />
