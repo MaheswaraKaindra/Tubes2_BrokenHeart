@@ -21,7 +21,7 @@ Aplikasi ini bertujuan untuk membantu pemain Little Alchemy 2 menemukan **jalur 
 
 ---
 
-## Cara Menjalankan Aplikasi (Dengan Deploy)
+## Cara Menjalankan Aplikasi (Dengan Deploy) - GUNAKAN feat/development
 Buka link Deployment pada bagian samping repositori.
 
 ## Cara Menjalankan Aplikasi (Tanpa Deploy)
