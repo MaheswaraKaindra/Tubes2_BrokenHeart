@@ -345,14 +345,12 @@ func scrapeAllData() {
 	fmt.Printf("Done. Data saved to %s\n", outputPath)
 }
 
-// CORS Middleware
 func enableCors(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 }
 
-// Utility: Load container from JSON files
 func loadElementContainerFromFiles() (*logic.ElementContainer, error) {
 	recipesPath := filepath.Join(".", "data", "recipes.json")
 	tiersPath := filepath.Join(".", "data", "tiers.json")
@@ -364,64 +362,6 @@ func loadElementContainerFromFiles() (*logic.ElementContainer, error) {
 	}
 	container := logic.BuildElementContainer(elements)
 	return &container, nil
-}
-
-func bfsHandler(w http.ResponseWriter, r *http.Request) {
-	enableCors(w)
-	if r.Method == http.MethodOptions {
-		return
-	}
-	if r.Method != http.MethodPost {
-		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var req SearchRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid JSON: "+err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	container, err := loadElementContainerFromFiles()
-	if err != nil {
-		http.Error(w, "Error loading data: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	root := logic.BreadthFirstSearch(req.Target, container, req.Index)
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(root)
-}
-
-func dfsHandler(w http.ResponseWriter, r *http.Request) {
-	enableCors(w)
-	if r.Method == http.MethodOptions {
-		return
-	}
-	if r.Method != http.MethodPost {
-		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var req SearchRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid JSON: "+err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	container, err := loadElementContainerFromFiles()
-	if err != nil {
-		http.Error(w, "Error loading data: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	var visitedCount = new(int)
-	*visitedCount = 0
-	root := logic.FirstDepthFirstSearch(req.Target, container, req.Index, visitedCount)
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(root)
 }
 
 func shortestbfsHandler(w http.ResponseWriter, r *http.Request) {
@@ -540,6 +480,7 @@ func multiplebfsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
+
 func multipledfsHandler(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	enableCors(w)
@@ -597,12 +538,4 @@ func main() {
 	if logErr != nil {
 		fmt.Println("Server error:", logErr)
 	}
-
-	// container, kocak := loadElementContainerFromFiles()
-	// if (kocak != nil) {
-	// 	return
-	// }
-	// result := logic.BreadthFirstSearch("tree", container, 2)
-	// logic.PrintTree(result.Node, " ", true)
-	// fmt.Println(result.VisitedCount)
 }
