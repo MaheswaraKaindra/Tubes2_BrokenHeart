@@ -48,7 +48,7 @@ Buka link Deployment pada bagian samping repositori.
 
 | Fitur                                                   | Penanggung Jawab       | NIM            |
 |----------------------------------------------------------|--------------------------|----------------|
-| Data Scraping (Backend)                                 | Maheswara Bayu Kaindra                                                      | 13523015     |
+| Data Scraping (Backend)                                 | Maheswara Bayu Kaindra & Shanice Feodora T.                                 | 13523015 & 13523097     |
 | Logic (Backend)                                         | Maheswara Bayu Kaindra & Jessica Allen                                      | 13523015 & 13523059     |
 | API (Backend-Frontend)                                  | Maheswara Bayu Kaindra & Jessica Allen                                      | 13523015 & 13523059     |
 | Frontend                                                | Jessica Allen & Shanice Feodora T.                                          | 13523059 & 13523097     |
