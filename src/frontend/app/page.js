@@ -23,8 +23,8 @@ const Profile = [
   {
     name: "Shanice Feodora Tjahjono",
     nim: "13523097",
-    pesan: "''-''",
-    img: "/water.png",
+    pesan: "''Pergi ke pasar liat orang terbang, puji Tuhan kelar dan ga tumbang.''",
+    img: "/fotoshanice.jpg",
     bg: "purple-dark",
     link:"https://www.linkedin.com/in/shanice-feodora-a8368124b/"
   }
