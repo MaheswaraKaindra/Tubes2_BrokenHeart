@@ -10,7 +10,7 @@ import (
 // Untuk enqueue : queue.PushBack(node)
 // Untuk dequeue : queue.Remove(queue.Front()), bisa simpan ke value jika butuh.
 
-func BreadthFirstSearch(target string, container *ElementContainer, index int) (*TreeNode, int) {
+func BreadthFirstSearch(target string, container *ElementContainer, index int) *Result {
 	target = strings.ToLower(target)
 	queue := make(chan *TreeNode, 100)
 	var wg sync.WaitGroup
@@ -18,7 +18,10 @@ func BreadthFirstSearch(target string, container *ElementContainer, index int) (
 	var root *TreeNode
 	if _, exists := container.Container[target]; !exists {
 		if !isBaseElement(target) {
-			return nil, 0
+			return &Result {
+				Node: nil,
+				VisitedCount: 0,
+			}
 		}
 	} else {
 		root = &TreeNode{Name: target, Image: container.ElementImage[target]}
@@ -101,10 +104,13 @@ func BreadthFirstSearch(target string, container *ElementContainer, index int) (
 	wg.Wait()
 	close(queue)
 
-	return root, visitedCount
+	return &Result{
+		Node: root,
+		VisitedCount: visitedCount,
+	}
 }
 
-func ShortestBreadthFirstSearch(target string, container *ElementContainer) (*TreeNode, int) {
+func ShortestBreadthFirstSearch(target string, container *ElementContainer) *Result {
 	target = strings.ToLower(target)
 	queue := make(chan *TreeNode, 100)
 	var wg sync.WaitGroup
@@ -112,7 +118,10 @@ func ShortestBreadthFirstSearch(target string, container *ElementContainer) (*Tr
 	var root *TreeNode
 	if _, exists := container.Container[target]; !exists {
 		if !isBaseElement(target) {
-			return nil, 0
+			return &Result {
+				Node: nil,
+				VisitedCount: 0,
+			}
 		}
 	} else {
 		root = &TreeNode{Name: target, Image: container.ElementImage[target]}
@@ -196,5 +205,8 @@ func ShortestBreadthFirstSearch(target string, container *ElementContainer) (*Tr
 	wg.Wait()
 	close(queue)
 
-	return root, visitedCount
+	return &Result{
+		Node: root,
+		VisitedCount: visitedCount,
+	}
 }

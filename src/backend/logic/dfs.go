@@ -7,37 +7,52 @@ import (
 
 var dfsMutex sync.Mutex
 
-func FirstDepthFirstSearch(target string, container *ElementContainer, index int) *TreeNode {
+func FirstDepthFirstSearch(target string, container *ElementContainer, index int, visitedCount *int) *Result {
 	target = strings.ToLower(target)
 	if _, exists := container.Container[target]; !exists {
 		if !isBaseElement(target) {
-			return nil
+			return &Result {
+				Node: nil,
+				VisitedCount: *visitedCount,
+			}
 		}
-		return &TreeNode{
+		var ResultTree *TreeNode = &TreeNode{
 			Name:  target,
 			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
+		}
+		return &Result{
+			Node: ResultTree,
+			VisitedCount: *visitedCount,
 		}
 	}
 
 	if isBaseElement(target) {
-		return &TreeNode{
+		var ResultTree *TreeNode = &TreeNode{
 			Name:  target,
 			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
+		}
+		return &Result{
+			Node: ResultTree,
+			VisitedCount: *visitedCount,
 		}
 	}
 
 	dfsMutex.Lock()
 	if container.IsVisited[target] {
 		dfsMutex.Unlock()
-		return &TreeNode{
+		var ResultTree *TreeNode = &TreeNode{
 			Name:  target,
 			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
+		}
+		return &Result{
+			Node: ResultTree,
+			VisitedCount: *visitedCount,
 		}
 	}
 	container.IsVisited[target] = true
@@ -51,17 +66,18 @@ func FirstDepthFirstSearch(target string, container *ElementContainer, index int
 		}
 
 		i++
-		var left, right *TreeNode
+		var left, right *Result
 		var wg sync.WaitGroup
 		wg.Add(2)
 
+		*visitedCount += 2;
 		go func(p ComponentKey) {
-			left = depthFirstSearch(p.Component1, container)
+			left = depthFirstSearch(p.Component1, container, visitedCount)
 			wg.Done()
 		}(pair)
 
 		go func(p ComponentKey) {
-			right = depthFirstSearch(p.Component2, container)
+			right = depthFirstSearch(p.Component2, container, visitedCount)
 			wg.Done()
 		}(pair)
 
@@ -72,11 +88,15 @@ func FirstDepthFirstSearch(target string, container *ElementContainer, index int
 		dfsMutex.Unlock()
 
 		if left != nil && right != nil {
-			return &TreeNode{
+			var ResultTree *TreeNode = &TreeNode{
 				Name:  target,
 				Image: container.ElementImage[target],
-				Left:  left,
-				Right: right,
+				Left:  left.Node,
+				Right: right.Node,
+			}
+			return &Result{
+				Node: ResultTree,
+				VisitedCount: *visitedCount,
 			}
 		}
 	}
@@ -84,37 +104,52 @@ func FirstDepthFirstSearch(target string, container *ElementContainer, index int
 	return nil
 }
 
-func ShortestDepthFirstSearch(target string, container *ElementContainer) *TreeNode {
+func ShortestDepthFirstSearch(target string, container *ElementContainer, visitedCount *int) *Result {
 	target = strings.ToLower(target)
 	if _, exists := container.Container[target]; !exists {
 		if !isBaseElement(target) {
-			return nil
+			return &Result{
+				Node: nil,
+				VisitedCount: *visitedCount,
+			}
 		}
-		return &TreeNode{
+		var ResultTree *TreeNode = &TreeNode{
 			Name:  target,
 			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
+		}
+		return &Result{
+			Node: ResultTree,
+			VisitedCount: *visitedCount,
 		}
 	}
 
 	if isBaseElement(target) {
-		return &TreeNode{
+		var ResultTree *TreeNode = &TreeNode{
 			Name:  target,
 			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
+		}
+		return &Result{
+			Node: ResultTree,
+			VisitedCount: *visitedCount,
 		}
 	}
 
 	dfsMutex.Lock()
 	if container.IsVisited[target] {
 		dfsMutex.Unlock()
-		return &TreeNode{
+		var ResultTree *TreeNode = &TreeNode{
 			Name:  target,
 			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
+		}
+		return &Result{
+			Node: ResultTree,
+			VisitedCount: *visitedCount,
 		}
 	}
 	container.IsVisited[target] = true
@@ -150,17 +185,17 @@ func ShortestDepthFirstSearch(target string, container *ElementContainer) *TreeN
 	i = minKey(shortestMap)
 	pair := container.Container[target][i]
 
-	var left, right *TreeNode
+	var left, right *Result
 	var wg sync.WaitGroup
 	wg.Add(2)
 
 	go func(p ComponentKey) {
-		left = depthFirstSearch(p.Component1, container)
+		left = depthFirstSearch(p.Component1, container, visitedCount)
 		wg.Done()
 	}(pair)
 
 	go func(p ComponentKey) {
-		right = depthFirstSearch(p.Component2, container)
+		right = depthFirstSearch(p.Component2, container, visitedCount)
 		wg.Done()
 	}(pair)
 
@@ -171,48 +206,67 @@ func ShortestDepthFirstSearch(target string, container *ElementContainer) *TreeN
 	dfsMutex.Unlock()
 
 	if left != nil && right != nil {
-		return &TreeNode{
+		var ResultTree *TreeNode = &TreeNode{
 			Name:  target,
 			Image: container.ElementImage[target],
-			Left:  left,
-			Right: right,
+			Left:  left.Node,
+			Right: right.Node,
+		}
+		return &Result{
+			Node: ResultTree,
+			VisitedCount: *visitedCount,
 		}
 	}
 
 	return nil
 }
 
-func depthFirstSearch(target string, container *ElementContainer) *TreeNode {
+func depthFirstSearch(target string, container *ElementContainer, visitedCount *int) *Result {
 	target = strings.ToLower(target)
 	if _, exists := container.Container[target]; !exists {
 		if !isBaseElement(target) {
-			return nil
+			return &Result{
+				Node: nil,
+				VisitedCount: *visitedCount,
+			}
 		}
-		return &TreeNode{
+		var ResultTree *TreeNode = &TreeNode{
 			Name:  target,
 			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
+		}
+		return &Result{
+			Node: ResultTree,
+			VisitedCount: *visitedCount,
 		}
 	}
 
 	if isBaseElement(target) {
-		return &TreeNode{
+		var ResultTree *TreeNode = &TreeNode{
 			Name:  target,
 			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
+		}
+		return &Result{
+			Node: ResultTree,
+			VisitedCount: *visitedCount,
 		}
 	}
 
 	dfsMutex.Lock()
 	if container.IsVisited[target] {
 		dfsMutex.Unlock()
-		return &TreeNode{
+		var ResultTree *TreeNode = &TreeNode{
 			Name:  target,
 			Image: container.ElementImage[target],
 			Left:  nil,
 			Right: nil,
+		}
+		return &Result{
+			Node: ResultTree,
+			VisitedCount: *visitedCount,
 		}
 	}
 	container.IsVisited[target] = true
@@ -230,17 +284,17 @@ func depthFirstSearch(target string, container *ElementContainer) *TreeNode {
 			continue
 		}
 
-		var left, right *TreeNode
+		var left, right *Result
 		var wg sync.WaitGroup
 		wg.Add(2)
 
 		go func(p ComponentKey) {
-			left = depthFirstSearch(p.Component1, container)
+			left = depthFirstSearch(p.Component1, container, visitedCount)
 			wg.Done()
 		}(pair)
 
 		go func(p ComponentKey) {
-			right = depthFirstSearch(p.Component2, container)
+			right = depthFirstSearch(p.Component2, container, visitedCount)
 			wg.Done()
 		}(pair)
 
@@ -251,11 +305,15 @@ func depthFirstSearch(target string, container *ElementContainer) *TreeNode {
 		dfsMutex.Unlock()
 
 		if left != nil && right != nil {
-			return &TreeNode{
+			var ResultTree *TreeNode = &TreeNode{
 				Name:  target,
 				Image: container.ElementImage[target],
-				Left:  left,
-				Right: right,
+				Left:  left.Node,
+				Right: right.Node,
+			}
+			return &Result{
+				Node: ResultTree,
+				VisitedCount: *visitedCount,
 			}
 		}
 	}

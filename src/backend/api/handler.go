@@ -416,7 +416,9 @@ func dfsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	root := logic.FirstDepthFirstSearch(req.Target, container, req.Index)
+	var visitedCount = new(int)
+	*visitedCount = 0
+	root := logic.FirstDepthFirstSearch(req.Target, container, req.Index, visitedCount)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(root)
@@ -482,7 +484,9 @@ func shortestdfsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	root := logic.ShortestDepthFirstSearch(req.Target, container)
+	var visitedCount = new(int)
+	*visitedCount = 0
+	root := logic.ShortestDepthFirstSearch(req.Target, container, visitedCount)
 	duration := time.Since(start)
 
 	response := map[string]interface{}{
@@ -564,7 +568,9 @@ func multipledfsHandler(w http.ResponseWriter, r *http.Request) {
 	var trees []interface{}
 
 	for i := 0; i < loopCount; i++ {
-		tree := logic.FirstDepthFirstSearch(req.Target, container, i)
+		var visitedCount = new(int)
+		*visitedCount = 0
+		tree := logic.FirstDepthFirstSearch(req.Target, container, i, visitedCount)
 		trees = append(trees, tree)
 	}
 	duration := time.Since(start)
@@ -580,7 +586,7 @@ func multipledfsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	scrapeAllData()
+	// scrapeAllData()
 	http.HandleFunc("/api/bfs", shortestbfsHandler)
 	http.HandleFunc("/api/dfs", shortestdfsHandler)
 	http.HandleFunc("/api/bfsmultiple", multiplebfsHandler)
