@@ -1,14 +1,9 @@
 package logic
 
 import (
-	// "container/list", gak jadi dipakai.
 	"strings"
 	"sync"
-	// "fmt"
 )
-
-// Untuk enqueue : queue.PushBack(node)
-// Untuk dequeue : queue.Remove(queue.Front()), bisa simpan ke value jika butuh.
 
 func BreadthFirstSearch(target string, container *ElementContainer, index int) *Result {
 	target = strings.ToLower(target)
@@ -18,11 +13,10 @@ func BreadthFirstSearch(target string, container *ElementContainer, index int) *
 	var root *TreeNode
 	if _, exists := container.Container[target]; !exists {
 		if !isBaseElement(target) {
-			return &Result {
-				Node: nil,
-				VisitedCount: 0,
-			}
+			return &Result{Node: nil, VisitedCount: 0}
 		}
+		root = &TreeNode{Name: target, Image: container.ElementImage[target]}
+		return &Result{Node: root, VisitedCount: 1}
 	} else {
 		root = &TreeNode{Name: target, Image: container.ElementImage[target]}
 	}
@@ -30,15 +24,12 @@ func BreadthFirstSearch(target string, container *ElementContainer, index int) *
 	queue <- root
 	first := true
 
-	visitedCount:= 0
+	visitedCount := 0
 	var mu sync.Mutex
 
 	wg.Add(1)
 	go func() {
 		for parentNode := range queue {
-			mu.Lock()
-			visitedCount++
-			mu.Unlock()
 
 			pairs := container.Container[parentNode.Name]
 			if len(pairs) == 0 {
@@ -81,18 +72,30 @@ func BreadthFirstSearch(target string, container *ElementContainer, index int) *
 			rightNode := &TreeNode{Name: rightName, Image: container.ElementImage[rightName]}
 
 			if !isBaseElement(leftName) {
+				mu.Lock()
+				visitedCount++
+				mu.Unlock()
 				parentNode.Left = leftNode
 				wg.Add(1)
 				queue <- leftNode
 			} else {
+				mu.Lock()
+				visitedCount++
+				mu.Unlock()
 				parentNode.Left = &TreeNode{Name: leftName, Image: container.ElementImage[leftName]}
 			}
 
 			if !isBaseElement(rightName) {
+				mu.Lock()
+				visitedCount++
+				mu.Unlock()
 				parentNode.Right = rightNode
 				wg.Add(1)
 				queue <- rightNode
 			} else {
+				mu.Lock()
+				visitedCount++
+				mu.Unlock()
 				parentNode.Right = &TreeNode{Name: rightName, Image: container.ElementImage[rightName]}
 			}
 
@@ -105,7 +108,7 @@ func BreadthFirstSearch(target string, container *ElementContainer, index int) *
 	close(queue)
 
 	return &Result{
-		Node: root,
+		Node:         root,
 		VisitedCount: visitedCount,
 	}
 }
@@ -118,23 +121,21 @@ func ShortestBreadthFirstSearch(target string, container *ElementContainer) *Res
 	var root *TreeNode
 	if _, exists := container.Container[target]; !exists {
 		if !isBaseElement(target) {
-			return &Result {
-				Node: nil,
-				VisitedCount: 0,
-			}
+			return &Result{Node: nil, VisitedCount: 0}
 		}
+		root = &TreeNode{Name: target, Image: container.ElementImage[target]}
+		return &Result{Node: root, VisitedCount: 1}
 	} else {
 		root = &TreeNode{Name: target, Image: container.ElementImage[target]}
 	}
 	queue <- root
 
-		visitedCount:= 0
-		var mu sync.Mutex
+	visitedCount := 0
+	var mu sync.Mutex
 
 	wg.Add(1)
 	go func() {
 		for parentNode := range queue {
-
 			mu.Lock()
 			visitedCount++
 			mu.Unlock()
@@ -151,7 +152,6 @@ func ShortestBreadthFirstSearch(target string, container *ElementContainer) *Res
 				t1, ok1 := container.ElementTier[pair.Component1]
 				t2, ok2 := container.ElementTier[pair.Component2]
 				tTarget, okT := container.ElementTier[parentNode.Name]
-
 				if !ok1 || !ok2 || !okT {
 					i++
 					continue
@@ -183,18 +183,30 @@ func ShortestBreadthFirstSearch(target string, container *ElementContainer) *Res
 			rightNode := &TreeNode{Name: rightName, Image: container.ElementImage[rightName]}
 
 			if !isBaseElement(leftName) {
+				mu.Lock()
+				visitedCount++
+				mu.Unlock()
 				parentNode.Left = leftNode
 				wg.Add(1)
 				queue <- leftNode
 			} else {
+				mu.Lock()
+				visitedCount++
+				mu.Unlock()
 				parentNode.Left = &TreeNode{Name: leftName, Image: container.ElementImage[leftName]}
 			}
 
 			if !isBaseElement(rightName) {
+				mu.Lock()
+				visitedCount++
+				mu.Unlock()
 				parentNode.Right = rightNode
 				wg.Add(1)
 				queue <- rightNode
 			} else {
+				mu.Lock()
+				visitedCount++
+				mu.Unlock()
 				parentNode.Right = &TreeNode{Name: rightName, Image: container.ElementImage[rightName]}
 			}
 
@@ -206,7 +218,7 @@ func ShortestBreadthFirstSearch(target string, container *ElementContainer) *Res
 	close(queue)
 
 	return &Result{
-		Node: root,
+		Node:         root,
 		VisitedCount: visitedCount,
 	}
 }

@@ -586,7 +586,7 @@ func multipledfsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	// scrapeAllData()
+	scrapeAllData()
 	http.HandleFunc("/api/bfs", shortestbfsHandler)
 	http.HandleFunc("/api/dfs", shortestdfsHandler)
 	http.HandleFunc("/api/bfsmultiple", multiplebfsHandler)
@@ -597,4 +597,12 @@ func main() {
 	if logErr != nil {
 		fmt.Println("Server error:", logErr)
 	}
+
+	// container, kocak := loadElementContainerFromFiles()
+	// if (kocak != nil) {
+	// 	return
+	// }
+	// result := logic.BreadthFirstSearch("tree", container, 2)
+	// logic.PrintTree(result.Node, " ", true)
+	// fmt.Println(result.VisitedCount)
 }
