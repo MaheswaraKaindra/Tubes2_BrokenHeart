@@ -527,7 +527,7 @@ func multipledfsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	scrapeAllData()
+	// scrapeAllData()
 	http.HandleFunc("/api/bfs", shortestbfsHandler)
 	http.HandleFunc("/api/dfs", shortestdfsHandler)
 	http.HandleFunc("/api/bfsmultiple", multiplebfsHandler)
